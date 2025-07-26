@@ -1,0 +1,317 @@
+/* * ============================== HERO ============================== */
+.banner__image {
+  background: url(./assets/banner-bg.jpg) no-repeat center center/cover;
+  border-radius: 0 0 9.4rem 9.4rem;
+  padding: 14rem 0;
+  overflow-x: hidden;
+}
+
+.hero__content * {
+  color: #fff;
+}
+
+.hero__content {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 0.5fr;
+  gap: 3rem;
+}
+
+.hero__left h2 {
+  margin: 1rem 0 2.5rem;
+  line-height: 3.5rem;
+}
+
+.hero__left p {
+  margin-bottom: 4.4rem;
+}
+
+.hero__left .search__input {
+  position: relative;
+  width: 65%;
+}
+
+.hero__left button {
+  position: absolute;
+  right: 0;
+}
+
+.hero__right {
+  position: relative;
+}
+
+.hero__right img {
+  height: 28rem;
+  border-radius: 1.6rem;
+}
+
+.hero__right .price__badge {
+  position: absolute;
+  right: 1.2rem;
+  top: 1.2rem;
+  border-radius: 1.6rem;
+  background-color: var(--color-primary);
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 700;
+  padding: 0.2rem 0.9rem;
+}
+
+.hero__right .offer__badge {
+  position: absolute;
+  display: block;
+  text-align: center;
+  width: 7rem;
+  height: 7rem;
+  left: -1.6rem;
+  bottom: -1.6rem;
+  border-radius: 50%;
+  background-color: var(--color-primary-variant);
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 7rem;
+}
+
+/* * ============================== FEATURES SECTION ============================== */
+.features {
+  position: relative;
+}
+
+.features__container {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+
+.feature__item {
+  padding: 2.2rem;
+  box-shadow: 0 0 0.9rem rgba(0, 0, 0, 0.15);
+  border-radius: 1.6rem;
+  background-color: #fff;
+  text-align: center;
+}
+
+.feature__item h4 {
+  margin-top: 1.6rem;
+}
+
+.feature__item span {
+  display: inline-block;
+  width: 6rem;
+  height: 6rem;
+  line-height: 6rem;
+  text-align: center;
+  background-color: var(--color-primary);
+  border-radius: 50%;
+  transition: var(--transition);
+}
+
+.feature__item span:hover {
+  background: var(--color-primary-variant);
+}
+
+.feature__item i {
+  font-size: 2.5rem;
+  color: #fff;
+}
+
+/* * ============================== TRENDİNG SECTION ============================== */
+
+.trending__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1rem 0 3rem;
+}
+
+.trending__items {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+
+.trending__item {
+  background: #eee;
+  position: relative;
+}
+
+.trending__item,
+.trending__item-image img {
+  border-radius: 1.5rem;
+}
+
+.trending__item-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 1.5rem;
+}
+
+.trending__item-content span {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.5rem 1rem 0.4rem;
+  background: var(--color-primary);
+  border-radius: 0.8rem;
+  color: #fff;
+  font-weight: 600;
+}
+
+.trending__item-content span .old__price {
+  font-size: 0.9rem;
+  text-decoration: line-through;
+  text-align: right;
+  font-weight: 400;
+}
+
+.trending__item-content button {
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  padding: 0 0.1rem;
+  background: var(--color-primary-variant);
+}
+
+.trending__item-content button i {
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+/* * ============================== GAMES SECTION ============================== */
+.games {
+  background: var(--color-bg);
+  border-radius: 9rem;
+}
+
+.games__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1rem 0 3rem;
+}
+
+.games__item {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 2rem;
+}
+
+.game__item {
+  background: #fff;
+  position: relative;
+}
+
+.game__item,
+.game__item-image img {
+  border-radius: 1.5rem;
+}
+
+.game__item-content {
+  position: relative;
+  text-align: center;
+  padding: 1rem 0 3.5rem;
+}
+
+.game__item-content p {
+  color: var(--color-gray-0);
+}
+
+.game__item button {
+  position: absolute;
+  bottom: -2.5rem;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* * ============================== CATEGORIES SECTION ============================== */
+
+.categories__container h2,
+.categories__container h6 {
+  text-align: center;
+}
+
+.categories__container h2 {
+  margin: 1rem 0 3rem;
+}
+
+.categories__cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2rem;
+}
+
+.categories__card {
+  border-radius: 1.6rem;
+  overflow: hidden;
+  text-align: center;
+  background-color: transparent;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.categories__card h4 {
+  background-color: var(--color-primary);
+  color: #fff;
+  padding: 1rem 0;
+}
+
+/* * ============================== CTA SECTION ============================== */
+
+.cta {
+  position: relative;
+}
+
+.shop__content,
+.subscribe__content {
+  background: var(--color-bg);
+  padding: 5rem 3.75rem;
+  border-radius: 1.5rem;
+  width: 29rem;
+}
+
+.shop__content p,
+.subscribe__content p {
+  margin: 3rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.shop__content .custom__text,
+.subscribe__content .custom__text {
+  color: var(--color-primary);
+}
+
+.subscribe__input {
+  margin-top: 3rem;
+  position: relative;
+}
+
+.subscribe__content button {
+  position: absolute;
+  right: 0;
+}
+
+.cta__container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.cta::after {
+  background-image: url(../assets/cta-bg.jpg);
+  width: 34rem;
+  height: 32rem;
+  position: absolute;
+  content: "";
+  border-radius: 1.6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+  z-index: -1;
+}
