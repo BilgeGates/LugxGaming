@@ -149,10 +149,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 12.5rem;
   padding: 2rem 1.5rem;
 }
 
-.trending__item-content span {
+.trending__item-content span.game__price {
   position: absolute;
   top: 1rem;
   right: 1rem;
@@ -163,14 +164,27 @@
   font-weight: 600;
 }
 
-.trending__item-content span .old__price {
+.trending__item-content span.game__price .old__price {
   font-size: 0.9rem;
   text-decoration: line-through;
   text-align: right;
   font-weight: 400;
 }
 
+.trending__item-content .game-category,
+.trending__item-content .game-title,
+.trending__item-content .game-date,
+.trending__item-content .game-rating {
+  color: var(--color-primary);
+  font-size: 1rem;
+  font-weight: 400;
+  font-style: normal;
+}
+
 .trending__item-content button {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
   border-radius: 50%;
   width: 2.5rem;
   height: 2.5rem;
@@ -182,6 +196,31 @@
 .trending__item-content button i {
   font-size: 1.5rem;
   color: #fff;
+}
+
+.item__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.item__text .rating {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: auto;
+  margin-bottom: 0.5rem;
+}
+
+.item__text .rating svg {
+  height: 1.5rem;
+}
+
+.item__text .release-date {
+  font-size: 0.8rem;
+  color: #888;
+  font-style: italic;
+  line-height: 1.3;
 }
 
 /* * ============================== GAMES SECTION ============================== */
