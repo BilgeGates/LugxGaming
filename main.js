@@ -11,32 +11,27 @@ const createStars = (rating) => {
 
   const totalWidth = starCount * starSize + (starCount - 1) * starSpacing;
 
-  // Rating-i tam və onluq hissələrə böl
-  const fullStars = Math.floor(rating); // Tam ulduzlar (məs: 3.6 üçün 3)
-  const partialStar = rating - fullStars; // Qismən ulduz (məs: 3.6 üçün 0.6)
+  const fullStars = Math.floor(rating);
+  const partialStar = rating - fullStars;
 
   const starPath =
     "M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z";
 
-  // Unique ID yaradırıq hər rating üçün
   const uniqueId = `clip-${Math.random().toString(36).substr(2, 9)}`;
 
   let starsHTML = "";
 
-  // Hər ulduz üçün ayrı-ayrılıqda yarat
   for (let i = 0; i < starCount; i++) {
     const xPosition = i * (starSize + starSpacing);
 
     if (i < fullStars) {
-      // Tam dolu ulduz
       starsHTML += `
         <g transform="translate(${xPosition}, 0)">
           <path d="${starPath}" fill="#ffd700" transform="scale(1)" />
         </g>
       `;
     } else if (i === fullStars && partialStar > 0) {
-      // Qismən dolu ulduz
-      const partialWidth = partialStar * starSize; // 0.6 üçün ulduzun 60%-i
+      const partialWidth = partialStar * starSize;
       const partialClipId = `${uniqueId}-partial-${i}`;
 
       starsHTML += `
@@ -46,14 +41,11 @@ const createStars = (rating) => {
           </clipPath>
         </defs>
         <g transform="translate(${xPosition}, 0)">
-          <!-- Boş ulduz -->
           <path d="${starPath}" fill="#e0e0e0" transform="scale(1)" />
-          <!-- Qismən dolu hissə -->
           <path d="${starPath}" fill="#ffd700" transform="scale(1)" clip-path="url(#${partialClipId})" />
         </g>
       `;
     } else {
-      // Boş ulduz
       starsHTML += `
         <g transform="translate(${xPosition}, 0)">
           <path d="${starPath}" fill="#e0e0e0" transform="scale(1)" />
