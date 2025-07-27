@@ -1,0 +1,120 @@
+[
+  {
+    "id": 1,
+    "image": "./assets/trending-01.jpg",
+    "title": "Call of Duty: Warzone",
+    "genre": "Shooter",
+    "price": "$22",
+    "oldPrice": "$28"
+  },
+  {
+    "id": 2,
+    "image": "./assets/trending-02.jpg",
+    "title": "FIFA 24",
+    "genre": "Sports",
+    "price": "$44"
+  },
+  {
+    "id": 3,
+    "image": "./assets/trending-03.jpg",
+    "title": "Assassin's Creed Mirage",
+    "genre": "Adventure",
+    "price": "$44",
+    "oldPrice": "$64"
+  },
+  {
+    "id": 4,
+    "image": "./assets/trending-04.jpg",
+    "title": "Cyberpunk 2077",
+    "genre": "RPG",
+    "price": "$32"
+  },
+  {
+    "id": 5,
+    "image": "./assets/trending-01.jpg",
+    "title": "God of War: Ragnarok",
+    "genre": "Action",
+    "price": "$35",
+    "oldPrice": "$50"
+  },
+  {
+    "id": 6,
+    "image": "./assets/trending-02.jpg",
+    "title": "Elden Ring",
+    "genre": "Fantasy",
+    "price": "$40"
+  },
+  {
+    "id": 7,
+    "image": "./assets/trending-03.jpg",
+    "title": "Red Dead Redemption 2",
+    "genre": "Open World",
+    "price": "$30",
+    "oldPrice": "$45"
+  },
+  {
+    "id": 8,
+    "image": "./assets/trending-04.jpg",
+    "title": "Apex Legends",
+    "genre": "Battle Royale",
+    "price": "$20"
+  },
+  {
+    "id": 9,
+    "image": "./assets/trending-01.jpg",
+    "title": "Fortnite",
+    "genre": "Survival",
+    "price": "$18"
+  },
+  {
+    "id": 10,
+    "image": "./assets/trending-02.jpg",
+    "title": "The Witcher 3",
+    "genre": "Fantasy",
+    "price": "$25",
+    "oldPrice": "$35"
+  },
+  {
+    "id": 11,
+    "image": "./assets/trending-03.jpg",
+    "title": "Valorant",
+    "genre": "Tactical Shooter",
+    "price": "$19"
+  },
+  {
+    "id": 12,
+    "image": "./assets/trending-04.jpg",
+    "title": "Hogwarts Legacy",
+    "genre": "Magic",
+    "price": "$33",
+    "oldPrice": "$49"
+  },
+  {
+    "id": 13,
+    "image": "./assets/trending-01.jpg",
+    "title": "Spider-Man: Miles Morales",
+    "genre": "Superhero",
+    "price": "$36"
+  },
+  {
+    "id": 14,
+    "image": "./assets/trending-02.jpg",
+    "title": "Minecraft",
+    "genre": "Sandbox",
+    "price": "$17"
+  },
+  {
+    "id": 15,
+    "image": "./assets/trending-03.jpg",
+    "title": "League of Legends",
+    "genre": "MOBA",
+    "price": "$15"
+  },
+  {
+    "id": 16,
+    "image": "./assets/trending-02.jpg",
+    "title": "FIFA 24",
+    "genre": "Sports",
+    "price": "$44"
+  }
+]
