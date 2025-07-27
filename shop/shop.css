@@ -1,0 +1,16 @@
+/* * ============================== HERO ============================== */
+.banner__image {
+  background: url(../assets/banner-bg.jpg) no-repeat center center/cover;
+  border-radius: 0 0 9.4rem 9.4rem;
+  padding: 14rem 0 6rem;
+  overflow-x: hidden;
+}
+
+.hero__container * {
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.2rem;
+}
