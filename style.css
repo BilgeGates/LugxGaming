@@ -196,6 +196,15 @@ nav.navbar.scrolled {
   border-radius: 0 0 1.5rem 1.5rem;
 }
 
+/* * ============================== HEADER ============================== */
+
+.banner__image {
+  background: url(./assets/banner-bg.jpg) no-repeat center center/cover;
+  border-radius: 0 0 9.4rem 9.4rem;
+  padding: 14rem 0;
+  overflow-x: hidden;
+}
+
 /* * ============================== FOOTER ============================== */
 
 footer {

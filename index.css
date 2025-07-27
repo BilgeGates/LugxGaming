@@ -1,11 +1,4 @@
 /* * ============================== HERO ============================== */
-.banner__image {
-  background: url(./assets/banner-bg.jpg) no-repeat center center/cover;
-  border-radius: 0 0 9.4rem 9.4rem;
-  padding: 14rem 0;
-  overflow-x: hidden;
-}
-
 .hero__content * {
   color: #fff;
 }
@@ -208,7 +201,6 @@
   display: flex;
   align-items: center;
   gap: 0.3rem;
-  margin-top: auto;
   margin-bottom: 0.5rem;
 }
 
