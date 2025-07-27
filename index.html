@@ -113,76 +113,9 @@
         <h6>Trending</h6>
         <div class="trending__title">
           <h2>Trending Games</h2>
-          <button class="btn">View All</button>
+          <button class="btn" id="loadGamesBtn">View All</button>
         </div>
-        <div class="trending__items">
-          <article class="trending__item">
-            <div class="trending__item-image">
-              <a href="./products/products.html">
-                <img src="./assets/trending-01.jpg" alt="" />
-              </a>
-            </div>
-            <div class="trending__item-content">
-              <div class="item__text">
-                <p>Action</p>
-                <h4>Assasin Creed</h4>
-              </div>
-              <button class="btn"><i class="uil uil-shopping-bag"></i></button>
-              <span>
-                <div class="old__price">$28</div>
-                $22
-              </span>
-            </div>
-          </article>
-          <article class="trending__item">
-            <div class="trending__item-image">
-              <a href="./products/products.html">
-                <img src="./assets/trending-02.jpg" alt=""
-              /></a>
-            </div>
-            <div class="trending__item-content">
-              <div class="item__text">
-                <p>Action</p>
-                <h4>Assasin Creed</h4>
-              </div>
-              <button class="btn"><i class="uil uil-shopping-bag"></i></button
-              ><span>$44</span>
-            </div>
-          </article>
-          <article class="trending__item">
-            <div class="trending__item-image">
-              <a href="./products/products.html"
-                ><img src="./assets/trending-03.jpg" alt=""
-              /></a>
-            </div>
-            <div class="trending__item-content">
-              <div class="item__text">
-                <p>Action</p>
-                <h4>Assasin Creed</h4>
-              </div>
-              <button class="btn"><i class="uil uil-shopping-bag"></i></button
-              ><span>
-                <div class="old__price">$64</div>
-                $44</span
-              >
-            </div>
-          </article>
-          <article class="trending__item">
-            <div class="trending__item-image">
-              <a href="./products/products.html">
-                <img src="./assets/trending-04.jpg" alt=""
-              /></a>
-            </div>
-            <div class="trending__item-content">
-              <div class="item__text">
-                <p>Action</p>
-                <h4>Assasin Creed</h4>
-              </div>
-              <button class="btn"><i class="uil uil-shopping-bag"></i></button
-              ><span>$32</span>
-            </div>
-          </article>
-        </div>
+        <div class="trending__items" id="trendingItems"></div>
       </div>
     </section>
 
@@ -320,6 +253,7 @@
         </div>
       </div>
     </section>
+
     <!-- ! ============================================== CTA SECTION ============================================== -->
     <section class="cta">
       <div class="container cta__container">
