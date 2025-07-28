@@ -37,6 +37,7 @@ html {
 
 body {
   font-family: "Poppins", sans-serif;
+  overflow-x: hidden;
 }
 
 section {
@@ -184,7 +185,7 @@ nav.navbar {
 
 .nav__menu-open,
 .nav__menu-close {
-  font-size: 1.6rem;
+  font-size: 2rem;
   background: transparent;
   display: none;
   color: #fff;
@@ -201,7 +202,7 @@ nav.navbar.scrolled {
 .banner__image {
   background: url(./assets/banner-bg.jpg) no-repeat center center/cover;
   border-radius: 0 0 9.4rem 9.4rem;
-  padding: 14rem 0;
+  padding: 14rem 0 6rem;
   overflow-x: hidden;
 }
 
@@ -222,25 +223,82 @@ footer p {
 
 /* * ============================== MEDIA QUERIES (small screens) ==============================  */
 
-@media screen and (max-width: 600px) {
-  h1 {
-    font-size: 2rem;
+@media screen and (max-width: 1024px) {
+  .nav__content {
+    gap: 3rem;
   }
 
-  h2 {
-    font-size: 1.4rem;
+  .nav__menu {
+    /* display: none; */
+    position: fixed;
+    top: 18%;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: column;
+    gap: 0;
+    width: 75%;
+    background: #fff;
+    border-radius: 0 0 1.5rem 1.5rem;
   }
 
-  h3 {
+  .nav__menu a {
+    height: 4rem;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    transform: rotateX(90deg);
+    color: var(--color-gray-200);
+    border-bottom: 1px solid var(--color-bg);
+    opacity: 0;
+    transform-origin: top;
+    animation: animation 1000ms ease forwards;
+  }
+
+  .nav__menu button {
+    background: transparent;
+    padding: 0;
+    font-weight: 300;
+    border-radius: none;
+    color: var(--color-gray-200);
+    text-transform: capitalize;
     font-size: 1rem;
   }
 
-  .btn {
-    padding: 1.5rem;
-    font-size: 0.8rem;
+  .nav__menu a:hover,
+  .nav__menu button:hover {
+    color: var(--color-primary-variant);
+    background: none;
   }
 
-  .container {
-    width: var(--container-w-md);
+  .nav__menu a:nth-child(2) {
+    animation-delay: 300ms;
+  }
+
+  .nav__menu a:nth-child(3) {
+    animation-delay: 550ms;
+  }
+
+  .nav__menu a:nth-child(4) {
+    animation-delay: 750ms;
+  }
+
+  .nav__menu button {
+    animation-delay: 900ms;
+  }
+
+  @keyframes animation {
+    to {
+      transform: rotate(0);
+      opacity: 1;
+    }
+  }
+
+  .nav__menu a.active {
+    border-radius: 0;
+    color: var(--color-primary-variant);
+  }
+
+  .nav__menu-open {
+    display: inline-block;
   }
 }

@@ -1,5 +1,22 @@
+const navMenu = document.querySelector(".nav__menu");
+const navMenuOpen = document.querySelector(".nav__menu-open");
+const navMenuClose = document.querySelector(".nav__menu-close");
 const loadGamesBtn = document.getElementById("loadGamesBtn");
+const shopBtn = document.getElementById("shopBtn");
 const trendingItems = document.getElementById("trendingItems");
+
+// Toggle mobile navigation menu open/close state
+navMenuOpen.addEventListener("click", () => {
+  navMenu.style.display = "flex";
+  navMenuOpen.style.display = "none";
+  navMenuClose.style.display = "inline-block";
+});
+
+navMenuClose.addEventListener("click", () => {
+  navMenu.style.display = "none";
+  navMenuOpen.style.display = "inline-block";
+  navMenuClose.style.display = "none";
+});
 
 let games = [];
 let isExpanded = false;
@@ -87,7 +104,9 @@ const createGame = (game) => {
           game.releaseDate
         }</div>
       </div>
-      <button class="btn"><i class="uil uil-shopping-bag"></i></button>
+      <button class="btn" id="shopBtn" onclick="addToCart(${
+        game.id
+      })"><i class="uil uil-shopping-bag"></i></button>
       <span class="game__price">${oldPrice}${game.price}</span>
     </div>
   `;

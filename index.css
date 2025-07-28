@@ -1,4 +1,8 @@
 /* * ============================== HERO ============================== */
+#homePageBanner {
+  padding-bottom: 14rem;
+}
+
 .hero__content * {
   color: #fff;
 }
@@ -30,6 +34,7 @@
 }
 
 .hero__right {
+  width: 100%;
   position: relative;
 }
 
@@ -345,4 +350,29 @@
   transform: translateX(-50%);
   top: 0;
   z-index: -1;
+}
+
+/* * ============================== MEDIA QUERIES (small screens) ==============================  */
+
+@media screen and (max-width: 1024px) {
+  .hero__content {
+    grid-template-columns: 1fr;
+    place-items: center;
+  }
+
+  .hero__left {
+    text-align: center;
+  }
+
+  .hero__left .search__input {
+    width: 100%;
+  }
+
+  .hero__right {
+    width: 100%;
+  }
+
+  .hero__right img {
+    height: 45rem;
+  }
 }
