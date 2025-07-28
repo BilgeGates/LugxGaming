@@ -1,5 +1,4 @@
 /* * ============================== GENERAL STYLES ============================== */
-
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900");
 
 * {
@@ -198,7 +197,6 @@ nav.navbar.scrolled {
 }
 
 /* * ============================== HEADER ============================== */
-
 .banner__image {
   background: url(./assets/banner-bg.jpg) no-repeat center center/cover;
   border-radius: 0 0 9.4rem 9.4rem;
@@ -207,7 +205,6 @@ nav.navbar.scrolled {
 }
 
 /* * ============================== FOOTER ============================== */
-
 footer {
   background: url(./assets/banner-bg.jpg) no-repeat center center/cover;
   border-radius: 9.4rem 9.4rem 0 0;
@@ -223,22 +220,52 @@ footer p {
 
 /* * ============================== MEDIA QUERIES (small screens) ==============================  */
 
-@media screen and (max-width: 1024px) {
-  .nav__content {
-    gap: 3rem;
+@media screen and (max-width: 1050px) {
+  /* h2 {
+    font-size: 1.8rem;
   }
 
+  h4 {
+    font-size: 1rem;
+  }
+
+  h6 {
+    font-size: 0.9rem;
+  }
+
+  header h2 {
+    font-size: 2.2rem;
+  }
+
+  header h6 {
+    font-size: 1.1rem;
+  }
+
+  section h2 {
+    font-size: 1.8rem;
+    line-height: 2.2rem;
+  }
+
+  p {
+    font-size: 0.85rem;
+    line-height: 1.6rem;
+  } */
+
+  /* .container {
+    width: var(--container-w-md);
+  } */
+
   .nav__menu {
-    /* display: none; */
+    display: none;
     position: fixed;
-    top: 18%;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 6rem;
+    right: 4%;
     flex-direction: column;
     gap: 0;
-    width: 75%;
+    width: 16rem;
     background: #fff;
     border-radius: 0 0 1.5rem 1.5rem;
+    border: 1px solid #c4c4c4;
   }
 
   .nav__menu a {
@@ -282,8 +309,9 @@ footer p {
     animation-delay: 750ms;
   }
 
-  .nav__menu button {
+  .nav__menu a:nth-child(5) {
     animation-delay: 900ms;
+    border: none;
   }
 
   @keyframes animation {
@@ -300,5 +328,9 @@ footer p {
 
   .nav__menu-open {
     display: inline-block;
+  }
+
+  footer {
+    padding: 2rem 0 3rem;
   }
 }

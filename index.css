@@ -354,7 +354,11 @@
 
 /* * ============================== MEDIA QUERIES (small screens) ==============================  */
 
-@media screen and (max-width: 1024px) {
+@media screen and (max-width: 950px) {
+  .container {
+    width: var(--container-w-md);
+  }
+
   .hero__content {
     grid-template-columns: 1fr;
     place-items: center;
@@ -368,11 +372,54 @@
     width: 100%;
   }
 
-  .hero__right {
-    width: 100%;
+  .hero__right img {
+    height: auto;
   }
 
-  .hero__right img {
-    height: 45rem;
+  .hero__right .offer__badge {
+    width: 5rem;
+    height: 5rem;
+    line-height: 5rem;
+    font-size: 1rem;
+    left: 1rem;
+    bottom: 1rem;
+  }
+
+  .features__container {
+    grid-template-columns: repeat(2, 1fr);
+    top: 5rem;
+  }
+
+  .trending__items {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .games__item {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3rem;
+  }
+
+  .categories__cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .cta::after {
+    display: none;
+  }
+
+  .cta__container {
+    align-items: center;
+    flex-direction: column;
+    gap: 2rem;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .trending__items {
+    grid-template-columns: 1fr;
+  }
+
+  .games__item {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
