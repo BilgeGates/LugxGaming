@@ -303,12 +303,31 @@
   position: relative;
 }
 
+.cta::after {
+  background-image: url(../assets/cta-bg.jpg);
+  width: 34rem;
+  height: 32rem;
+  position: absolute;
+  content: "";
+  border-radius: 1.6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+  z-index: -1;
+}
+
+.cta__container {
+  display: grid;
+  place-items: end;
+  grid-template-columns: repeat(2, 1fr);
+}
+
 .shop__content,
 .subscribe__content {
   background: var(--color-bg);
   padding: 5rem 3.75rem;
   border-radius: 1.5rem;
-  width: 29rem;
+  width: 26rem;
 }
 
 .shop__content p,
@@ -324,8 +343,8 @@
 }
 
 .subscribe__input {
-  margin-top: 3rem;
   position: relative;
+  margin-top: 3rem;
 }
 
 .subscribe__content button {
@@ -333,28 +352,9 @@
   right: 0;
 }
 
-.cta__container {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-}
-
-.cta::after {
-  background-image: url(../assets/cta-bg.jpg);
-  width: 34rem;
-  height: 32rem;
-  position: absolute;
-  content: "";
-  border-radius: 1.6rem;
-  left: 50%;
-  transform: translateX(-50%);
-  top: 0;
-  z-index: -1;
-}
-
 /* * ============================== MEDIA QUERIES (small screens) ==============================  */
 
-@media screen and (max-width: 950px) {
+@media screen and (max-width: 1024px) {
   .container {
     width: var(--container-w-md);
   }
@@ -408,18 +408,35 @@
   }
 
   .cta__container {
-    align-items: center;
-    flex-direction: column;
+    grid-template-columns: 1fr;
+    place-items: center;
     gap: 2rem;
+  }
+
+  .shop__content,
+  .subscribe__content {
+    width: auto;
   }
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 600px) {
+  .features {
+    display: none;
+  }
+
   .trending__items {
     grid-template-columns: 1fr;
   }
 
+  .games {
+    border-radius: 4rem;
+  }
+
   .games__item {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
+  }
+
+  .categories__cards {
+    grid-template-columns: 1fr;
   }
 }
