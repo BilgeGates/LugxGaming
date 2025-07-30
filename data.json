@@ -112,41 +112,5 @@
     "oldPrice": "$49",
     "rating": 4.3,
     "releaseDate": "02.10.2023"
-  },
-  {
-    "id": 13,
-    "image": "./assets/trending-01.jpg",
-    "title": "Spider-Man: Miles Morales",
-    "genre": "Superhero",
-    "price": "$36",
-    "rating": 4.6,
-    "releaseDate": "11.12.2020"
-  },
-  {
-    "id": 14,
-    "image": "./assets/trending-02.jpg",
-    "title": "Minecraft",
-    "genre": "Sandbox",
-    "price": "$17",
-    "rating": 4.8,
-    "releaseDate": "11.18.2011"
-  },
-  {
-    "id": 15,
-    "image": "./assets/trending-03.jpg",
-    "title": "League of Legends",
-    "genre": "MOBA",
-    "price": "$15",
-    "rating": 4.2,
-    "releaseDate": "10.27.2009"
-  },
-  {
-    "id": 16,
-    "image": "./assets/trending-02.jpg",
-    "title": "FIFA 24",
-    "genre": "Sports",
-    "price": "$44",
-    "rating": 4.4,
-    "releaseDate": "09.29.2023"
   }
 ]
