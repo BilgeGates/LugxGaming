@@ -127,7 +127,13 @@ window.addEventListener("DOMContentLoaded", async () => {
     const res = await fetch("./data.json");
     games = await res.json();
 
-    showGames(4);
+    const screenWidth = window.innerWidth;
+
+    if (screenWidth <= 1274) {
+      showGames(3);
+    } else {
+      showGames(4);
+    }
 
     if (games.length <= 4) {
       loadGamesBtn.style.display = "none";
