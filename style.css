@@ -31,6 +31,7 @@
 }
 
 html {
+  scroll-behavior: smooth;
   font-size: 16px;
 }
 
@@ -388,5 +389,10 @@ footer p {
   input {
     height: 2.8rem;
     font-size: 0.8rem;
+  }
+
+  footer {
+    border-radius: 4rem 4rem 0 0;
+    padding: 2rem 0 4rem;
   }
 }
