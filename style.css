@@ -201,7 +201,7 @@ nav.navbar.scrolled {
 .banner__image {
   background: url(./assets/banner-bg.jpg) no-repeat center center/cover;
   border-radius: 0 0 9.4rem 9.4rem;
-  padding: 14rem 0 0;
+  padding: 14rem 0 2rem;
   overflow-x: hidden;
 }
 
