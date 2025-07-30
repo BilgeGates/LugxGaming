@@ -8,10 +8,10 @@
 }
 
 .hero__content {
-  width: 100%;
   display: grid;
-  grid-template-columns: 1fr 0.5fr;
-  gap: 3rem;
+  grid-template-columns: 1fr 1fr;
+  place-items: start;
+  gap: 2rem;
 }
 
 .hero__left h2 {
@@ -25,7 +25,7 @@
 
 .hero__left .search__input {
   position: relative;
-  width: 65%;
+  width: 80%;
 }
 
 .hero__left button {
@@ -34,12 +34,11 @@
 }
 
 .hero__right {
-  width: 100%;
   position: relative;
+  justify-self: end;
 }
 
 .hero__right img {
-  height: 28rem;
   border-radius: 1.6rem;
 }
 
@@ -352,48 +351,31 @@
   right: 0;
 }
 
-/* * ============================== MEDIA QUERIES (small screens) ==============================  */
+/* * ============================== MEDIA QUERIES (large screens) ==============================  */
 
-@media screen and (max-width: 1024px) {
+@media screen and (max-width: 1274px) {
+  .trending__items {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media screen and (max-width: 1100px) {
   .container {
     width: var(--container-w-md);
   }
 
-  .hero__content {
+  .cta::after {
+    display: none;
+  }
+
+  .cta__container {
     grid-template-columns: 1fr;
-    place-items: center;
+    place-items: start;
+    gap: 2rem;
   }
+}
 
-  .hero__left {
-    text-align: center;
-  }
-
-  .hero__left .search__input {
-    width: 100%;
-  }
-
-  .hero__right img {
-    height: auto;
-  }
-
-  .hero__right .offer__badge {
-    width: 5rem;
-    height: 5rem;
-    line-height: 5rem;
-    font-size: 1rem;
-    left: 1rem;
-    bottom: 1rem;
-  }
-
-  .features__container {
-    grid-template-columns: repeat(2, 1fr);
-    top: 5rem;
-  }
-
-  .trending__items {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
+@media screen and (max-width: 1024px) {
   .games__item {
     grid-template-columns: repeat(2, 1fr);
     gap: 3rem;
@@ -419,13 +401,53 @@
   }
 }
 
-@media screen and (max-width: 600px) {
-  .features {
-    display: none;
+@media screen and (max-width: 864px) {
+  .hero__content {
+    grid-template-columns: 1fr;
+    place-items: center;
+    gap: 4rem;
+  }
+
+  .hero__left {
+    text-align: center;
+  }
+
+  .hero__left .search__input {
+    margin: 0 auto;
+  }
+
+  .hero__right {
+    justify-self: center;
+  }
+
+  .features__container {
+    grid-template-columns: repeat(2, 1fr);
+    bottom: -1rem;
   }
 
   .trending__items {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 565px) {
+  .trending__items {
     grid-template-columns: 1fr;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .hero__right .offer__badge {
+    width: 4rem;
+    height: 4rem;
+    line-height: 4rem;
+    font-size: 1.2rem;
+    bottom: 1rem;
+    left: 1rem;
+  }
+
+  .features {
+    display: none;
   }
 
   .games {
