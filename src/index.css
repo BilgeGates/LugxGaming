@@ -1,5 +1,5 @@
 /* * ============================== GENERAL STYLES ============================== */
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap");
 
 * {
   margin: 0;
@@ -22,16 +22,17 @@
 
   --container-w-lg: 84%;
   --container-w-md: 92%;
-
   --transition: all 0.5s ease;
 }
 
 .dark {
-  --color-gray-0: #f7f7f7;
-  --color-gray-100: #7a7a7a;
-  --color-gray-200: #4a4a4a;
+  --color-primary: #3399ff;
+  --color-primary-variant: #ff6b81;
+  --color-gray-0: #f1f1f1;
+  --color-gray-100: #cccccc;
+  --color-gray-200: #f7f7f7;
   --color-gray-300: #1e1e1e;
-  --color-bg: #000;
+  --color-bg: #121212;
 }
 
 .container {
@@ -45,7 +46,7 @@ html {
 }
 
 body {
-  font-family: "Poppins", sans-serif;
+  font-family: "Inter", sans-serif;
   overflow-x: hidden;
   background: var(--color-bg);
 }

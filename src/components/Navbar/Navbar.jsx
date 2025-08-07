@@ -21,7 +21,7 @@ const Navbar = () => {
   // Scroll effect
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 100) {
+      if (window.scrollY > 0) {
         setScrolled(true);
       } else {
         setScrolled(false);
@@ -52,11 +52,8 @@ const Navbar = () => {
             <Link to="/" className="active" onClick={toggleMenu}>
               Home
             </Link>
-            <Link to="/shop" onClick={toggleMenu}>
-              Our Shop
-            </Link>
             <Link to="/products" onClick={toggleMenu}>
-              Product Details
+              Products
             </Link>
             <Link to="/contact" onClick={toggleMenu}>
               Contact Us

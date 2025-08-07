@@ -23,8 +23,6 @@ const Header = () => {
             </div>
             <div className="hero__right">
               <img src={HERO_IMG} alt="" />
-              <span className="price__badge">$22</span>
-              <span className="offer__badge">-40%</span>
             </div>
           </div>
         </div>

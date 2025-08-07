@@ -14,20 +14,12 @@ const Games = () => {
     const fetchTopRatedGames = async () => {
       try {
         const res = await fetch(API_URL);
-        if (!res.ok) {
-          throw new Error(`HTTP Error: ${res.status}`);
-        }
-
+        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
         const data = await res.json();
-
-        const filtered = data.results.filter(
-          (game) => game.rating >= 4.5 && game.ratings_count > 80
-        );
-
-        setTopGames(filtered.slice(0, 6));
+        const filtered = data.results.filter((game) => game.rating >= 4.8);
+        setTopGames(filtered.slice(0, 4));
       } catch (err) {
-        console.error("Failed to fetch top-rated games:", err);
-        setError("Failed to load games. Please try again later.");
+        setError("Error loading genres:", err.message);
       } finally {
         setLoading(false);
       }
@@ -36,8 +28,67 @@ const Games = () => {
     fetchTopRatedGames();
   }, []);
 
-  if (loading) return <p>Loading top games...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  const getRatingColor = (rating) => {
+    const score = rating * 20;
+    if (score < 60) return "#ff4444";
+    if (score < 80) return "#ffaa00";
+    return "#44ff44";
+  };
+
+  const formatRatingScore = (rating) => Math.round(rating * 20);
+
+  const renderGameCard = (game) => {
+    const genre = game.genres?.[0]?.name;
+    const releaseDate = game.released;
+    const rating = game.rating;
+    const image = game.background_image;
+    const name = game.name;
+    const ratingScore = formatRatingScore(rating);
+    const ratingColor = getRatingColor(rating);
+
+    return (
+      <div className="game__item" key={game.id}>
+        <div className="game__item-image">
+          <Link to={`/products/${game.id}`}>
+            <img src={image} alt={name} />
+          </Link>
+        </div>
+        <div className="game__item-content">
+          <p>
+            <span className="category">Category:</span> {genre}
+          </p>
+          <h4>
+            <span className="title">Name:</span> {name}
+          </h4>
+          <p className="game__date">
+            <span className="date">Release Date:</span> {releaseDate}
+          </p>
+          <span
+            className="game__rating-score"
+            style={{
+              position: "absolute",
+              top: "1rem",
+              right: "1rem",
+              color: ratingColor,
+              fontWeight: "bold",
+              border: `1px solid ${ratingColor}`,
+              padding: "4px 8px",
+              borderRadius: "4px",
+              fontSize: "14px",
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+              minWidth: "35px",
+              textAlign: "center",
+            }}
+          >
+            {ratingScore}
+          </span>
+          <Link to={`/products/${game.id}`}>
+            <button className="btn">Explore</button>
+          </Link>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <section className="games">
@@ -50,28 +101,10 @@ const Games = () => {
           </Link>
         </div>
 
-        <div className="games__item">
-          {topGames.map((game) => (
-            <article className="game__item" key={game.id}>
-              <div className="game__item-image">
-                <Link to={`/products/${game.id}`}>
-                  <img
-                    src={game.background_image}
-                    alt={game.name}
-                    loading="lazy"
-                  />
-                </Link>
-              </div>
-              <div className="game__item-content">
-                <p>Category: {game.genres?.[0]?.name}</p>
-                <h4>Game Name: {game.name}</h4>
-                <Link to={`/products/${game.id}`}>
-                  <button className="btn">Explore</button>
-                </Link>
-              </div>
-            </article>
-          ))}
-        </div>
+        {loading}
+        {error}
+
+        <div className="game__items">{topGames.map(renderGameCard)}</div>
       </div>
     </section>
   );
