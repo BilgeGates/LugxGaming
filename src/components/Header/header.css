@@ -1,0 +1,109 @@
+.banner__image {
+  background: url(../../assets/banner-bg.jpg) no-repeat center center/cover;
+  border-radius: 0 0 9.4rem 9.4rem;
+  padding: 14rem 0 2rem;
+  overflow-x: hidden;
+}
+
+#homePageBanner {
+  padding-bottom: 14rem;
+}
+
+.hero__content * {
+  color: #fff;
+}
+
+.hero__content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  place-items: start;
+  gap: 2rem;
+}
+
+.hero__left h2 {
+  margin: 1rem 0 2.5rem;
+  line-height: 3.5rem;
+}
+
+.hero__left p {
+  margin-bottom: 4.4rem;
+}
+
+.hero__left .search__input {
+  position: relative;
+  width: 80%;
+}
+
+.hero__left button {
+  position: absolute;
+  right: 0;
+}
+
+.hero__right {
+  position: relative;
+  justify-self: end;
+}
+
+.hero__right img {
+  border-radius: 1.6rem;
+}
+
+.hero__right .price__badge {
+  position: absolute;
+  right: 1.2rem;
+  top: 1.2rem;
+  border-radius: 1.6rem;
+  background-color: var(--color-primary);
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 700;
+  padding: 0.2rem 0.9rem;
+}
+
+.hero__right .offer__badge {
+  position: absolute;
+  display: block;
+  text-align: center;
+  width: 7rem;
+  height: 7rem;
+  left: -1.6rem;
+  bottom: -1.6rem;
+  border-radius: 50%;
+  background-color: var(--color-primary-variant);
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 7rem;
+}
+
+/* * ============================== MEDIA QUERIES ============================== */
+@media screen and (max-width: 864px) {
+  .hero__content {
+    grid-template-columns: 1fr;
+    place-items: center;
+    gap: 4rem;
+  }
+
+  .hero__left {
+    text-align: center;
+  }
+
+  .hero__left .search__input {
+    margin: 0 auto;
+  }
+
+  .hero__right {
+    justify-self: center;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .hero__right .offer__badge {
+    width: 4rem;
+    height: 4rem;
+    line-height: 4rem;
+    font-size: 1.2rem;
+    bottom: 1rem;
+    left: 1rem;
+  }
+}
