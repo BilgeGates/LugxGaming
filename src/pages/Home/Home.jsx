@@ -4,7 +4,6 @@ import Header from "../../components/Header/Header";
 import TrendingGames from "../../components/TrendingGames/TrendingGames";
 import Games from "../../components/Games/Games";
 import Categories from "../../components/Categories/Categories";
-import CTA from "../../components/CTA/CTA";
 import Footer from "../../components/Footer/Footer";
 
 const Home = () => {
@@ -15,7 +14,6 @@ const Home = () => {
       <TrendingGames />
       <Games />
       <Categories />
-      <CTA />
       <Footer />
     </>
   );

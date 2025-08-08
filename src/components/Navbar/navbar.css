@@ -34,14 +34,15 @@ nav.navbar {
   font-weight: 300;
 }
 
-.nav__menu a.active {
+.nav__menu a.active,
+.nav__menu a:hover {
   background-color: rgba(255, 255, 255, 0.1);
   padding: 0.5rem 1rem;
   border-radius: 4rem;
 }
 
 .nav__logo {
-  width: 10rem;
+  width: 9rem;
 }
 
 .nav__menu-open,
@@ -51,6 +52,7 @@ nav.navbar {
   display: none;
   color: #fff;
   cursor: pointer;
+  z-index: 100;
 }
 
 .theme__btn {
