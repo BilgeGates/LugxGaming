@@ -22,7 +22,8 @@
 
   --container-w-lg: 84%;
   --container-w-md: 92%;
-  --transition: all ease;
+
+  --transition: all 0.5s ease;
 }
 
 .dark {
