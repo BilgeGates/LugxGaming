@@ -38,10 +38,7 @@ const Navbar = () => {
         </div>
 
         <div className="nav__content">
-          <div
-            className={`nav__menu${menuOpen ? " open" : ""}`}
-            style={{ display: menuOpen ? "flex" : "" }}
-          >
+          <div className={`nav__menu${menuOpen ? " open" : ""}`}>
             <NavLink
               to="/"
               onClick={toggleMenu}

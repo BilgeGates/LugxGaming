@@ -1,0 +1,521 @@
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 20px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.error-container {
+  text-align: center;
+  padding: 50px 20px;
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.back-btn {
+  padding: 10px 20px;
+  background: #007bff;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+.back-btn:hover {
+  background: #0056b3;
+}
+
+.game-hero {
+  height: 500px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+}
+
+.hero-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.5) 50%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  padding: 0;
+}
+
+.hero-overlay .container {
+  padding: 40px 20px;
+}
+
+.breadcrumb {
+  color: #ccc;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.breadcrumb a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.hero-title {
+  font-size: 3rem;
+  color: #fff;
+  margin: 0 0 10px;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.hero-meta {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.hero-rating,
+.hero-date {
+  color: #ccc;
+  font-weight: 500;
+}
+
+.game-details {
+  padding: 60px 0;
+  background: #f8f9fa;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.main-info-card {
+  background: #fff;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 30px;
+}
+
+.game-image {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.game-image img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+}
+
+.image-overlay {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+
+.rating-badge {
+  padding: 8px 12px;
+  border-radius: 20px;
+  color: #fff;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.game-info h2 {
+  font-size: 2.5rem;
+  margin: 0 0 25px;
+  color: #333;
+}
+
+.rating-section {
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.rating-main {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.rating-score {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.rating-text {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.rating-details {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+  color: #888;
+}
+
+.metacritic {
+  padding: 2px 8px;
+  background: #666;
+  color: #fff;
+  border-radius: 3px;
+}
+
+.quick-info {
+  margin-bottom: 25px;
+}
+
+.info-item {
+  display: flex;
+  margin-bottom: 8px;
+}
+
+.label {
+  font-weight: 600;
+  color: #555;
+  min-width: 120px;
+}
+
+.value {
+  color: #333;
+}
+
+.genres-section,
+.platforms-section,
+.tags-section {
+  margin-bottom: 25px;
+}
+
+.genres-section h3,
+.platforms-section h3,
+.tags-section h3 {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.genre-tags,
+.platform-list,
+.tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.genre-tag {
+  background: linear-gradient(45deg, #007bff, #0056b3);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.platform-tag {
+  background: #28a745;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+}
+
+.tag-item {
+  background: #6c757d;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.side-info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-box {
+  background: #fff;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.info-box h3 {
+  margin: 0 0 20px;
+  font-size: 1.3rem;
+  color: #333;
+}
+
+.info-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #555;
+  font-size: 14px;
+  margin-bottom: 3px;
+}
+
+.info-value,
+.info-link {
+  color: #333;
+  font-size: 14px;
+}
+
+.info-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.info-link:hover {
+  text-decoration: underline;
+}
+
+.description-section {
+  margin-top: 40px;
+}
+
+.description-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.description-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #007bff, #28a745, #ffc107, #dc3545);
+}
+
+.description-card h3 {
+  margin: 0 0 25px;
+  font-size: 1.8rem;
+  color: #2c3e50;
+  font-weight: 700;
+  position: relative;
+  padding-left: 15px;
+}
+
+.description-card h3::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 25px;
+  background: linear-gradient(45deg, #007bff, #0056b3);
+  border-radius: 2px;
+}
+
+.description-content {
+  transition: max-height 0.3s ease;
+  position: relative;
+}
+
+.description-content.collapsed {
+  max-height: 200px;
+  overflow: hidden;
+}
+
+.description-content.collapsed::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(transparent, #fff);
+  pointer-events: none;
+}
+
+.description-content p {
+  line-height: 1.8;
+  color: #444;
+  margin: 0;
+  font-size: 16px;
+  text-align: justify;
+}
+
+.show-more-btn {
+  margin-top: 20px;
+  padding: 12px 24px;
+  background: linear-gradient(45deg, #007bff, #0056b3);
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.show-more-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.show-more-btn:hover::before {
+  left: 100%;
+}
+
+.show-more-btn:hover {
+  background: linear-gradient(45deg, #0056b3, #004494);
+  box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.show-more-btn:active {
+  transform: translateY(0px);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .main-info-card {
+    grid-template-columns: 1fr;
+  }
+
+  .game-image {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .game-hero {
+    height: 300px;
+    background-attachment: scroll;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .main-info-card,
+  .info-box,
+  .description-card {
+    padding: 20px;
+  }
+
+  .game-image {
+    max-width: 100%;
+  }
+
+  .game-image img {
+    height: 250px;
+  }
+
+  .hero-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+/* Dark mode support */
+.dark .game-details {
+  background: #1a1a1a;
+}
+
+.dark .main-info-card,
+.dark .info-box {
+  background: #2d2d2d;
+  color: #fff;
+}
+
+.dark .description-card {
+  background: linear-gradient(135deg, #2d2d2d 0%, #1e1e2e 100%);
+  color: #fff;
+}
+
+.dark .description-content.collapsed::after {
+  background: linear-gradient(transparent, #2d2d2d);
+}
+
+.dark .description-content p {
+  color: #e0e0e0;
+}
+
+.dark .game-info h2,
+.dark .info-box h3,
+.dark .description-card h3 {
+  color: #fff;
+}
+
+.dark .label,
+.dark .info-label {
+  color: #ccc;
+}
+
+.dark .value,
+.dark .info-value {
+  color: #eee;
+}
