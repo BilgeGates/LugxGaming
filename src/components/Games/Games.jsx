@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import "./games.css";
+import "../common.style.css";
 
 const API_KEY = "28dbf80fd39248b19263558419c182e3";
 const API_URL = `https://api.rawg.io/api/games?key=${API_KEY}&page_size=40&ordering=-rating`;
@@ -47,24 +47,24 @@ const Games = () => {
     const ratingColor = getRatingColor(rating);
 
     return (
-      <div className="game__item" key={game.id}>
-        <div className="game__item-image">
+      <div className="card" key={game.id}>
+        <div className="card__image">
           <Link to={`/products/${game.id}`}>
             <img src={image} alt={name} />
           </Link>
         </div>
-        <div className="game__item-content">
+        <div className="card__content">
           <p>
             <span className="category">Category:</span> {genre}
           </p>
           <h4>
             <span className="title">Name:</span> {name}
           </h4>
-          <p className="game__date">
+          <p>
             <span className="date">Release Date:</span> {releaseDate}
           </p>
           <span
-            className="game__rating-score"
+            className="rating-score"
             style={{
               position: "absolute",
               top: "1rem",
@@ -83,7 +83,7 @@ const Games = () => {
             {ratingScore}
           </span>
           <Link to={`/products/${game.id}`}>
-            <button className="btn">Explore</button>
+            <button className="btn card__btn">Explore</button>
           </Link>
         </div>
       </div>
@@ -91,12 +91,18 @@ const Games = () => {
   };
 
   return (
-    <section className="games">
-      <div className="container games__container">
+    <section
+      className="games"
+      style={{
+        background: "var(--color-gray-300)",
+        borderRadius: "5rem",
+      }}
+    >
+      <div className="container card__container">
         <h6>Top Games</h6>
-        <div className="games__title">
+        <div className="card__header">
           <h2>Most Played</h2>
-          <Link to="/shop">
+          <Link to="/products">
             <button className="btn">View All</button>
           </Link>
         </div>
@@ -104,7 +110,7 @@ const Games = () => {
         {loading}
         {error}
 
-        <div className="game__items">{topGames.map(renderGameCard)}</div>
+        <div className="cards">{topGames.map(renderGameCard)}</div>
       </div>
     </section>
   );

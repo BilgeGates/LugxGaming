@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import Logo from "../../assets/logo.png";
 import { FaRegMoon, FaBars, FaTimes } from "react-icons/fa";
 import { FiSun } from "react-icons/fi";
@@ -21,27 +21,20 @@ const Navbar = () => {
   // Scroll effect
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 0) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
+      setScrolled(window.scrollY > 0);
     };
 
     window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
       <div className="container nav__container">
         <div className="nav__logo">
-          <Link to="/">
+          <NavLink to="/">
             <img src={Logo} alt="Logo" />
-          </Link>
+          </NavLink>
         </div>
 
         <div className="nav__content">
@@ -49,15 +42,27 @@ const Navbar = () => {
             className={`nav__menu${menuOpen ? " open" : ""}`}
             style={{ display: menuOpen ? "flex" : "" }}
           >
-            <Link to="/" className="active" onClick={toggleMenu}>
+            <NavLink
+              to="/"
+              onClick={toggleMenu}
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
               Home
-            </Link>
-            <Link to="/products" onClick={toggleMenu}>
+            </NavLink>
+            <NavLink
+              to="/products"
+              onClick={toggleMenu}
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
               Products
-            </Link>
-            <Link to="/contact" onClick={toggleMenu}>
+            </NavLink>
+            <NavLink
+              to="/contact"
+              onClick={toggleMenu}
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
               Contact Us
-            </Link>
+            </NavLink>
           </div>
 
           <button

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import "./trendinggames.css";
+import "../common.style.css";
 
 const API_KEY = "28dbf80fd39248b19263558419c182e3";
 const API_URL = `https://api.rawg.io/api/games?key=${API_KEY}&page_size=36`;
@@ -48,24 +48,24 @@ const TrendingGames = () => {
     const ratingColor = getRatingColor(rating);
 
     return (
-      <div className="trending__item" key={game.id}>
-        <div className="trending__item-image">
+      <div className="card" key={game.id}>
+        <div className="card__image">
           <Link to={`/products/${game.id}`}>
             <img src={image} alt={name} />
           </Link>
         </div>
-        <div className="trending__item-content">
+        <div className="card__content">
           <p>
             <span className="category">Category:</span> {genre}
           </p>
           <h4>
             <span className="title">Name:</span> {name}
           </h4>
-          <p className="game__date">
+          <p>
             <span className="date">Release Date:</span> {releaseDate}
           </p>
           <span
-            className="game__rating-score"
+            className="rating-score"
             style={{
               position: "absolute",
               top: "1rem",
@@ -84,7 +84,7 @@ const TrendingGames = () => {
             {ratingScore}
           </span>
           <Link to={`/products/${game.id}`}>
-            <button className="btn">Explore</button>
+            <button className="btn card__btn">Explore</button>
           </Link>
         </div>
       </div>
@@ -93,9 +93,9 @@ const TrendingGames = () => {
 
   return (
     <section className="trending">
-      <div className="container trending__container">
+      <div className="container card__container">
         <h6>Trending</h6>
-        <div className="trending__title">
+        <div className="card__header">
           <h2>Trending Games</h2>
           <Link to="/products">
             <button className="btn">View All</button>
@@ -105,9 +105,7 @@ const TrendingGames = () => {
         {loading}
         {error}
 
-        <div className="trending__items">
-          {visibleGames.map(renderGameCard)}
-        </div>
+        <div className="cards">{visibleGames.map(renderGameCard)}</div>
       </div>
     </section>
   );
