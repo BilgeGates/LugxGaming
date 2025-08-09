@@ -1,139 +1,14 @@
-nav.navbar {
-  background: transparent;
-  margin-inline: auto;
-  width: 100%;
-  padding: 2rem 0;
-  display: grid;
-  place-items: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 2;
-  transition: var(--transition);
-}
-
-.nav__container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.nav__content {
-  display: flex;
-  align-items: center;
-  gap: 3rem;
-}
-
-.nav__menu {
-  display: flex;
-  align-items: center;
-  gap: 3rem;
-}
-
-.nav__menu a {
-  font-weight: 300;
-}
-
-.nav__menu a.active,
-.nav__menu a:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  padding: 0.5rem 1rem;
-  border-radius: 4rem;
-}
-
-.nav__logo {
-  width: 9rem;
-}
-
-.nav__menu-open,
-.nav__menu-close {
-  font-size: 2rem;
-  background: transparent;
-  display: none;
-  color: #fff;
-  cursor: pointer;
-  z-index: 100;
-}
-
-.theme__btn {
-  font-size: 1.5rem;
-  background: transparent;
-  color: #fff;
-  cursor: pointer;
-}
-
-nav.navbar.scrolled {
-  background-color: var(--color-primary);
-  padding: 1rem 0;
-  border-radius: 0 0 1.5rem 1.5rem;
-}
-
-/* * ============================== MEDIA QUERIES ============================== */
-@media screen and (max-width: 1024px) {
-  .nav__menu {
-    display: none;
-    position: fixed;
-    top: 6rem;
-    right: 4%;
-    flex-direction: column;
-    gap: 0;
-    width: 16rem;
-    background: #fff;
-    border-radius: 0 0 1.5rem 1.5rem;
-    border: 1px solid #c4c4c4;
-  }
-
-  .nav__menu a {
-    height: 4rem;
-    display: grid;
-    place-items: center;
-    width: 100%;
-    transform: rotateX(90deg);
-    color: var(--color-gray-200);
-    border-bottom: 1px solid var(--color-gray-300);
+@keyframes slideDown {
+  0% {
     opacity: 0;
-    transform-origin: top;
-    animation: animation 1000ms ease forwards;
+    transform: translateY(-10%);
   }
-
-  .nav__menu a:hover {
-    color: var(--color-primary-variant);
-  }
-
-  .nav__menu a:nth-child(2) {
-    animation-delay: 300ms;
-  }
-
-  .nav__menu a:nth-child(3) {
-    animation-delay: 550ms;
-    border: none;
-  }
-
-  @keyframes animation {
-    to {
-      transform: rotate(0);
-      opacity: 1;
-    }
-  }
-
-  .nav__menu a.active {
-    border-radius: 0;
-    color: var(--color-primary-variant);
-  }
-
-  .nav__menu-open {
-    display: inline-block;
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@media screen and (max-width: 600px) {
-  .nav__menu {
-    width: 14rem;
-    top: 5rem;
-  }
-
-  .nav__menu a {
-    height: 3.5rem;
-    font-size: 0.9rem;
-  }
+.animate-slide-down {
+  animation: slideDown 0.3s ease forwards;
 }
