@@ -26,7 +26,6 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Menü link üçün class merge helper
   const navLinkClass = ({ isActive }) =>
     `block px-6 py-2 rounded-full font-light transition-colors duration-300 ${
       isActive
