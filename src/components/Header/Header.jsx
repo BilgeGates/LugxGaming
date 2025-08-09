@@ -91,7 +91,6 @@ const Header = () => {
     setShowResults(false);
   };
 
-  // Burada oyun seçiləndə productdetails səhifəsinə yönləndiririk
   const handleGameSelect = (game) => {
     navigate(`/products/${game.id}`);
     clearSearch();
