@@ -1,23 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import Logo from "../../assets/logo.png";
-import { FaRegMoon, FaBars, FaTimes } from "react-icons/fa";
-import { FiSun } from "react-icons/fi";
+import { FaBars, FaTimes } from "react-icons/fa";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [darkTheme, setDarkTheme] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
-  const toggleTheme = () => setDarkTheme(!darkTheme);
 
-  // Dark theme effect
-  useEffect(() => {
-    document.body.classList.toggle("dark", darkTheme);
-  }, [darkTheme]);
-
-  // Scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
@@ -42,7 +33,6 @@ const Navbar = () => {
       }`}
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
-        {/* Logo */}
         <NavLink
           to="/"
           onClick={() => setMenuOpen(false)}
@@ -51,7 +41,6 @@ const Navbar = () => {
           <img src={Logo} alt="Logo" className="w-36 md:w-40" />
         </NavLink>
 
-        {/* Desktop Menu */}
         <div className="hidden lg:flex items-center space-x-12">
           <NavLink
             to="/"
@@ -74,25 +63,9 @@ const Navbar = () => {
           >
             Contact Us
           </NavLink>
-          <button
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-            className="ml-6 text-white text-xl hover:text-cyan-400 transition-colors"
-          >
-            {darkTheme ? <FiSun /> : <FaRegMoon />}
-          </button>
         </div>
 
-        {/* Mobile Hamburger */}
         <div className="lg:hidden flex items-center space-x-4">
-          <button
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-            className="text-white text-2xl hover:text-cyan-400 transition-colors"
-          >
-            {darkTheme ? <FiSun /> : <FaRegMoon />}
-          </button>
-
           <button
             onClick={toggleMenu}
             aria-label={menuOpen ? "Close menu" : "Open menu"}
@@ -103,7 +76,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {menuOpen && (
         <div className="lg:hidden fixed top-20 right-4 w-56 bg-white rounded-3xl shadow-lg overflow-hidden animate-slide-down z-40">
           <nav className="flex flex-col">
