@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Search,
-  X,
-  Gamepad2,
-  Star,
-  Calendar,
-  Users,
-  TrendingUp,
-} from "lucide-react";
+import { Gamepad2, Star, Users, TrendingUp, Heart, Search } from "lucide-react";
+
+import SearchBar from "./SearchBar";
+import FavoritesModal from "./FavoritesModal";
+import RecentModal from "./RecentModal";
+import RatingModal from "./RatingModal";
 
 const API_KEY = "28dbf80fd39248b19263558419c182e3";
 const API_URL = `https://api.rawg.io/api/games?key=${API_KEY}&page_size=40`;
@@ -20,11 +17,46 @@ const Header = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [allGames, setAllGames] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedGenre, setSelectedGenre] = useState("");
+  const [sortBy, setSortBy] = useState("relevance");
+  const [favorites, setFavorites] = useState([]);
+  const [pinnedFavorites, setPinnedFavorites] = useState([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showFavoritesModal, setShowFavoritesModal] = useState(false);
+  const [gameRatings, setGameRatings] = useState({});
+  const [recentViews, setRecentViews] = useState([]);
+  const [showRecentModal, setShowRecentModal] = useState(false);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [ratingGameData, setRatingGameData] = useState(null);
 
   const navigate = useNavigate();
 
+  const heroImages = [
+    "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&h=400&fit=crop&crop=center",
+    "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&h=400&fit=crop&crop=center",
+    "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=600&h=400&fit=crop&crop=center",
+  ];
+
+  const genres = [
+    { id: "action", name: "Action" },
+    { id: "adventure", name: "Adventure" },
+    { id: "role-playing-games-rpg", name: "RPG" },
+    { id: "shooter", name: "Shooter" },
+    { id: "strategy", name: "Strategy" },
+    { id: "sports", name: "Sports" },
+    { id: "racing", name: "Racing" },
+    { id: "puzzle", name: "Puzzle" },
+  ];
+
   useEffect(() => {
     fetchGames();
+
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const fetchGames = async () => {
@@ -40,8 +72,8 @@ const Header = () => {
     }
   };
 
-  const handleSearch = async (term) => {
-    if (term.trim() === "") {
+  const handleSearch = async (term, genre = "", sort = "relevance") => {
+    if (term.trim() === "" && genre === "") {
       setSearchResults([]);
       setShowResults(false);
       return;
@@ -50,9 +82,14 @@ const Header = () => {
     setIsSearching(true);
 
     try {
-      const searchURL = `https://api.rawg.io/api/games?key=${API_KEY}&search=${encodeURIComponent(
-        term
-      )}&page_size=10`;
+      let searchURL = `https://api.rawg.io/api/games?key=${API_KEY}&page_size=15`;
+
+      if (term.trim()) searchURL += `&search=${encodeURIComponent(term)}`;
+      if (genre) searchURL += `&genres=${genre}`;
+      if (sort === "rating") searchURL += `&ordering=-rating`;
+      else if (sort === "released") searchURL += `&ordering=-released`;
+      else if (sort === "metacritic") searchURL += `&ordering=-metacritic`;
+
       const response = await fetch(searchURL);
       const data = await response.json();
 
@@ -64,8 +101,8 @@ const Header = () => {
         (game) =>
           game.name.toLowerCase().includes(term.toLowerCase()) ||
           (game.genres &&
-            game.genres.some((genre) =>
-              genre.name.toLowerCase().includes(term.toLowerCase())
+            game.genres.some((genreObj) =>
+              genreObj.name.toLowerCase().includes(term.toLowerCase())
             ))
       );
       setSearchResults(localResults);
@@ -75,53 +112,196 @@ const Header = () => {
     }
   };
 
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-
-    clearTimeout(window.searchTimeout);
-    window.searchTimeout = setTimeout(() => {
-      handleSearch(value);
-    }, 500);
-  };
-
   const clearSearch = () => {
     setSearchTerm("");
+    setSelectedGenre("");
+    setSortBy("relevance");
     setSearchResults([]);
     setShowResults(false);
+    setShowFilters(false);
   };
 
   const handleGameSelect = (game) => {
+    const gameData = {
+      id: game.id,
+      name: game.name,
+      background_image: game.background_image,
+      rating: game.rating,
+      released: game.released,
+      genres: game.genres || [],
+      metacritic: game.metacritic,
+      viewedAt: new Date().toISOString(),
+    };
+    addToRecentViews(gameData);
     navigate(`/products/${game.id}`);
     clearSearch();
+    setShowFavoritesModal(false);
+    setShowRecentModal(false);
   };
 
+  const addToRecentViews = (gameData) => {
+    setRecentViews((prev) => {
+      const filtered = prev.filter((item) => item.id !== gameData.id);
+      return [gameData, ...filtered].slice(0, 10);
+    });
+  };
+  const clearRecentViews = () => setRecentViews([]);
+
+  const toggleFavorite = (game) => {
+    const gameId = typeof game === "object" ? game.id : game;
+    const gameData =
+      typeof game === "object"
+        ? game
+        : searchResults.find((g) => g.id === gameId) ||
+          allGames.find((g) => g.id === gameId);
+
+    setFavorites((prev) => {
+      const exists = prev.find((fav) => fav.id === gameId);
+      if (exists) {
+        setPinnedFavorites((prevPinned) =>
+          prevPinned.filter((pin) => pin.id !== gameId)
+        );
+        return prev.filter((fav) => fav.id !== gameId);
+      } else {
+        return [...prev, gameData];
+      }
+    });
+  };
+  const togglePin = (gameId) => {
+    const game = favorites.find((fav) => fav.id === gameId);
+    if (!game) return;
+    setPinnedFavorites((prev) => {
+      const exists = prev.find((pin) => pin.id === gameId);
+      return exists ? prev.filter((pin) => pin.id !== gameId) : [...prev, game];
+    });
+  };
+  const removeFavorite = (gameId) => {
+    setFavorites((prev) => prev.filter((fav) => fav.id !== gameId));
+    setPinnedFavorites((prev) => prev.filter((pin) => pin.id !== gameId));
+  };
+
+  const openRatingModal = (game, event) => {
+    event?.stopPropagation();
+    setRatingGameData(game);
+    setShowRatingModal(true);
+  };
+  const getUserRating = (gameId) => gameRatings[gameId]?.rating || 0;
   const getRatingColor = (rating) => {
     if (rating >= 4.5) return "text-green-500";
     if (rating >= 4) return "text-yellow-500";
     if (rating >= 3) return "text-orange-500";
     return "text-red-500";
   };
+  const formatTimeAgo = (dateString) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `${diffInDays}d ago`;
+  };
+  const formatDate = (dateString) =>
+    dateString ? new Date(dateString).getFullYear() : "N/A";
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    return new Date(dateString).getFullYear();
+  const isGameFavorited = (gameId) =>
+    favorites.some((fav) => fav.id === gameId);
+  const isGamePinned = (gameId) =>
+    pinnedFavorites.some((pin) => pin.id === gameId);
+  const getSortedFavorites = () => {
+    const pinned = pinnedFavorites;
+    const unpinned = favorites.filter(
+      (fav) => !pinnedFavorites.some((pin) => pin.id === fav.id)
+    );
+    return [...pinned, ...unpinned];
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden pt-20">
-      {/* Background Animation */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-10 left-10 w-20 h-20 bg-pink-500 rounded-full animate-pulse"></div>
-        <div className="absolute top-32 right-20 w-16 h-16 bg-cyan-500 rounded-full animate-bounce"></div>
-        <div className="absolute bottom-32 left-32 w-24 h-24 bg-yellow-500 rounded-full animate-ping"></div>
-        <div className="absolute bottom-10 right-10 w-12 h-12 bg-green-500 rounded-full animate-spin"></div>
-      </div>
+  const stats = [
+    {
+      icon: TrendingUp,
+      label: `${allGames.length} games`,
+      color: "text-cyan-400",
+    },
+    { icon: Star, label: "RAWG DB", color: "text-yellow-400" },
+    {
+      icon: Heart,
+      label: `${favorites.length} favorites`,
+      color: "text-red-400",
+      onClick: () => setShowFavoritesModal(true),
+      clickable: true,
+    },
+    {
+      icon: Search,
+      label: `${recentViews.length} recent`,
+      color: "text-blue-400",
+      onClick: () => setShowRecentModal(true),
+      clickable: true,
+    },
+  ];
 
-      <header className="relative z-10">
+  return (
+    <div
+      className="min-h-screen relative overflow-hidden"
+      style={{
+        background:
+          "linear-gradient(135deg, rgb(88, 28, 135), rgb(30, 58, 138), rgb(67, 56, 202))",
+      }}
+    >
+      {/* Modallar */}
+      <FavoritesModal
+        show={showFavoritesModal}
+        onClose={() => setShowFavoritesModal(false)}
+        favorites={favorites}
+        pinnedFavorites={pinnedFavorites}
+        toggleFavorite={toggleFavorite}
+        togglePin={togglePin}
+        removeFavorite={removeFavorite}
+        handleGameSelect={handleGameSelect}
+        getSortedFavorites={getSortedFavorites}
+        isGamePinned={isGamePinned}
+        getUserRating={getUserRating}
+        openRatingModal={openRatingModal}
+        getRatingColor={getRatingColor}
+        formatDate={formatDate}
+      />
+      <RecentModal
+        show={showRecentModal}
+        onClose={() => setShowRecentModal(false)}
+        recentViews={recentViews}
+        clearRecentViews={clearRecentViews}
+        handleGameSelect={handleGameSelect}
+        formatTimeAgo={formatTimeAgo}
+        getUserRating={getUserRating}
+        openRatingModal={openRatingModal}
+        toggleFavorite={toggleFavorite}
+        isGameFavorited={isGameFavorited}
+      />
+      <RatingModal
+        show={showRatingModal}
+        onClose={() => setShowRatingModal(false)}
+        game={ratingGameData}
+        onSubmitRating={(rating) => {
+          if (ratingGameData) {
+            setGameRatings((prev) => ({
+              ...prev,
+              [ratingGameData.id]: {
+                rating,
+                ratedAt: new Date().toISOString(),
+              },
+            }));
+            setShowRatingModal(false);
+            setRatingGameData(null);
+          }
+        }}
+      />
+
+      <header className="relative z-10 pt-20">
         <div className="container mx-auto px-6 py-8">
-          <div className="flex flex-col lg:flex-row items-center justify-between min-h-[80vh]">
-            {/* Left side - Text and search */}
+          <div
+            className="flex flex-col lg:flex-row items-center justify-between min-h-screen lg:min-h-0"
+            style={{ minHeight: "80vh" }}
+          >
             <div className="lg:w-1/2 space-y-8">
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-cyan-400">
@@ -130,223 +310,121 @@ const Header = () => {
                     Welcome to Lugx
                   </span>
                 </div>
-
                 <h1 className="text-5xl lg:text-7xl font-bold text-white leading-tight">
                   Best{" "}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
+                  <span
+                    style={{
+                      background:
+                        "linear-gradient(45deg, rgb(34, 211, 238), rgb(168, 85, 247))",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                  >
                     Gaming
                   </span>{" "}
                   Site Ever!
                 </h1>
-
                 <p className="text-gray-300 text-lg leading-relaxed max-w-lg">
-                  LUGX Gaming will help you find the best games. Search among
-                  thousands of games and discover your favorite one.
+                  Discover amazing games from our curated collection. Search,
+                  filter, and find your next favorite game with advanced search
+                  capabilities.
                 </p>
-
                 {loading && (
                   <div className="flex items-center gap-2 text-cyan-400">
-                    <div className="w-4 h-4 border-2 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin"></div>
+                    <div className="w-4 h-4 border-2 border-cyan-200 border-t-cyan-400 rounded-full animate-spin"></div>
                     <span>Loading games...</span>
                   </div>
                 )}
               </div>
 
-              {/* Search section */}
-              <div className="relative">
-                <div className="relative flex items-center">
-                  <div className="relative flex-1">
-                    <Search
-                      className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                      size={20}
-                    />
-                    <input
-                      type="text"
-                      value={searchTerm}
-                      onChange={handleInputChange}
-                      placeholder="Search by game name or genre... (e.g. GTA, RPG, Action)"
-                      className="w-full pl-12 pr-12 py-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-300"
-                    />
-                    {searchTerm && (
-                      <button
-                        onClick={clearSearch}
-                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                      >
-                        <X size={20} />
-                      </button>
-                    )}
-                  </div>
+              <SearchBar
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                showFilters={showFilters}
+                setShowFilters={setShowFilters}
+                selectedGenre={selectedGenre}
+                setSelectedGenre={setSelectedGenre}
+                sortBy={sortBy}
+                setSortBy={setSortBy}
+                genres={genres}
+                handleSearch={handleSearch}
+                clearSearch={clearSearch}
+                searchResults={searchResults}
+                showResults={showResults}
+                setShowResults={setShowResults}
+                handleGameSelect={handleGameSelect}
+                getRatingColor={getRatingColor}
+                getUserRating={getUserRating}
+                openRatingModal={openRatingModal}
+                toggleFavorite={toggleFavorite}
+                isGameFavorited={isGameFavorited}
+                formatDate={formatDate}
+              />
 
-                  <button
-                    onClick={() => handleSearch(searchTerm)}
-                    disabled={isSearching}
-                    className="ml-4 px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold rounded-xl hover:from-cyan-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-cyan-500/25 disabled:opacity-50"
-                  >
-                    {isSearching ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        Searching...
-                      </div>
-                    ) : (
-                      "Search"
-                    )}
-                  </button>
-                </div>
-
-                {/* Search results */}
-                {showResults && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-md rounded-xl border border-white/20 shadow-2xl max-h-96 overflow-y-auto z-50">
-                    {searchResults.length > 0 ? (
-                      <div className="p-4">
-                        <h3 className="text-gray-800 font-semibold mb-3 flex items-center gap-2">
-                          <Search size={16} />
-                          Found games ({searchResults.length})
-                        </h3>
-                        <div className="space-y-3">
-                          {searchResults.map((game) => (
-                            <div
-                              key={game.id}
-                              onClick={() => handleGameSelect(game)}
-                              className="flex items-center gap-4 p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors group"
-                            >
-                              <img
-                                src={
-                                  game.background_image ||
-                                  "https://via.placeholder.com/64x40?text=No+Image"
-                                }
-                                alt={game.name}
-                                className="w-16 h-10 object-cover rounded-md"
-                                onError={(e) => {
-                                  e.target.src =
-                                    "https://via.placeholder.com/64x40?text=No+Image";
-                                }}
-                              />
-                              <div className="flex-1">
-                                <h4 className="font-semibold text-gray-800 group-hover:text-purple-600 transition-colors">
-                                  {game.name}
-                                </h4>
-                                <div className="flex items-center gap-4 text-sm text-gray-600">
-                                  {game.genres && game.genres.length > 0 && (
-                                    <span className="flex items-center gap-1">
-                                      <Gamepad2 size={14} />
-                                      {game.genres[0].name}
-                                    </span>
-                                  )}
-                                  {game.rating && (
-                                    <span
-                                      className={`flex items-center gap-1 ${getRatingColor(
-                                        game.rating
-                                      )}`}
-                                    >
-                                      <Star size={14} />
-                                      {game.rating}
-                                    </span>
-                                  )}
-                                  <span className="flex items-center gap-1">
-                                    <Calendar size={14} />
-                                    {formatDate(game.released)}
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                {game.metacritic && (
-                                  <div
-                                    className={`text-xs px-2 py-1 rounded ${
-                                      game.metacritic >= 80
-                                        ? "bg-green-100 text-green-800"
-                                        : game.metacritic >= 60
-                                        ? "bg-yellow-100 text-yellow-800"
-                                        : "bg-red-100 text-red-800"
-                                    }`}
-                                  >
-                                    {game.metacritic}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="p-8 text-center text-gray-600">
-                        <Search
-                          size={48}
-                          className="mx-auto mb-4 text-gray-400"
-                        />
-                        <h3 className="text-lg font-semibold mb-2">
-                          No results found
-                        </h3>
-                        <p>
-                          No games matched your search for "{searchTerm}". Try
-                          searching for something else.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Popular searches */}
-              <div className="flex flex-wrap gap-2">
-                <span className="text-gray-400 text-sm">Popular searches:</span>
-                {[
-                  "Action",
-                  "RPG",
-                  "Adventure",
-                  "Shooter",
-                  "Strategy",
-                  "Sports",
-                ].map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => {
-                      setSearchTerm(tag);
-                      handleSearch(tag);
-                    }}
-                    className="px-3 py-1 bg-white/10 hover:bg-white/20 text-cyan-400 text-sm rounded-full transition-colors cursor-pointer hover:scale-105 transform duration-200"
-                  >
-                    #{tag}
-                  </button>
-                ))}
-              </div>
-
-              {/* Statistics */}
-              {!loading && allGames.length > 0 && (
-                <div className="flex items-center gap-6 text-sm text-gray-300">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp size={16} className="text-cyan-400" />
-                    <span>{allGames.length} games loaded</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Star size={16} className="text-yellow-400" />
-                    <span>RAWG Database</span>
-                  </div>
+              {!loading && (
+                <div className="flex items-center gap-6 text-sm text-gray-300 flex-wrap">
+                  {stats.map((stat, index) => (
+                    <div
+                      key={index}
+                      className={`flex items-center gap-2 ${
+                        stat.clickable
+                          ? "cursor-pointer hover:scale-105 transition-transform"
+                          : ""
+                      }`}
+                      onClick={stat.onClick}
+                    >
+                      <stat.icon size={16} className={stat.color} />
+                      <span>{stat.label}</span>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* Right side - Image */}
             <div className="lg:w-1/2 flex justify-center lg:justify-end mt-12 lg:mt-0">
               <div className="relative">
-                <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-full blur-xl opacity-30 animate-pulse"></div>
                 <img
-                  src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&h=400&fit=crop&crop=center"
+                  src={heroImages[currentImageIndex]}
                   alt="Gaming Hero"
-                  className="relative w-full max-w-lg h-auto rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-300"
+                  className="relative w-full max-w-lg h-auto rounded-2xl shadow-2xl transform hover:scale-105 transition-all duration-500"
                 />
-                <div className="absolute -bottom-4 -right-4 bg-gradient-to-r from-cyan-500 to-purple-600 p-4 rounded-xl shadow-lg animate-bounce">
-                  <Gamepad2 size={32} className="text-white" />
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                  {heroImages.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        index === currentImageIndex
+                          ? "bg-white"
+                          : "bg-white bg-opacity-50"
+                      }`}
+                    />
+                  ))}
                 </div>
-
-                {/* Floating game cards */}
-                <div className="absolute -left-8 top-8 bg-white/10 backdrop-blur-md p-3 rounded-lg shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300">
+                <div
+                  className="absolute p-3 rounded-lg shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300"
+                  style={{
+                    left: "-32px",
+                    top: "32px",
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    backdropFilter: "blur(10px)",
+                  }}
+                >
                   <div className="flex items-center gap-2 text-white text-sm">
                     <Star size={16} className="text-yellow-400" />
                     <span>4.8 Rating</span>
                   </div>
                 </div>
-
-                <div className="absolute -right-6 top-1/3 bg-white/10 backdrop-blur-md p-3 rounded-lg shadow-lg transform -rotate-3 hover:rotate-0 transition-transform duration-300">
+                <div
+                  className="absolute p-3 rounded-lg shadow-lg transform -rotate-3 hover:rotate-0 transition-transform duration-300"
+                  style={{
+                    right: "-24px",
+                    top: "33%",
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    backdropFilter: "blur(10px)",
+                  }}
+                >
                   <div className="flex items-center gap-2 text-white text-sm">
                     <Users size={16} className="text-green-400" />
                     <span>1M+ Players</span>
