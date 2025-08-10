@@ -110,7 +110,7 @@ const Contact = () => {
                   Azerbaijan, Baku
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                  28 May Street 15
+                  28 May
                 </p>
               </div>
             </div>
