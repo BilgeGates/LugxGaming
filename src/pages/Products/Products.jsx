@@ -3,15 +3,13 @@ import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import "./products.css";
-import "../../components/common.style.css";
 
-// API Configuration
 const API_KEY = "28dbf80fd39248b19263558419c182e3";
 const API_URL = `https://api.rawg.io/api/games?key=${API_KEY}&page_size=40`;
+
 const GAMES_PER_PAGE = 8;
 
 const Products = () => {
-  // State Management
   const [allGames, setAllGames] = useState([]);
   const [filteredGames, setFilteredGames] = useState([]);
   const [displayedGames, setDisplayedGames] = useState([]);
@@ -21,7 +19,6 @@ const Products = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Fetch games and genres from API
   useEffect(() => {
     async function fetchGames() {
       try {
@@ -29,7 +26,6 @@ const Products = () => {
         if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
         const data = await res.json();
 
-        // Filter out games without genres
         const validGames = data.results.filter(
           (game) => game.genres && game.genres.length > 0
         );
@@ -37,7 +33,6 @@ const Products = () => {
         setAllGames(validGames);
         setFilteredGames(validGames);
 
-        // Extract unique genres and sort them
         const uniqueGenres = [
           ...new Set(
             validGames.flatMap((game) =>
@@ -57,14 +52,12 @@ const Products = () => {
     fetchGames();
   }, []);
 
-  // Handle pagination and display games for current page
   useEffect(() => {
     const startIndex = (currentPage - 1) * GAMES_PER_PAGE;
     const endIndex = startIndex + GAMES_PER_PAGE;
     setDisplayedGames(filteredGames.slice(startIndex, endIndex));
   }, [filteredGames, currentPage]);
 
-  // Handle filter button clicks
   const handleFilterClick = (filter) => {
     setActiveFilter(filter);
     setCurrentPage(1);
@@ -72,7 +65,6 @@ const Products = () => {
     if (filter === "all") {
       setFilteredGames(allGames);
     } else {
-      // Filter games by selected genre
       const genreName = filter.replace(".", "").replace(/-/g, " ");
       const filtered = allGames.filter((game) =>
         game.genres.some(
@@ -83,10 +75,8 @@ const Products = () => {
     }
   };
 
-  // Pagination calculation
   const totalPages = Math.ceil(filteredGames.length / GAMES_PER_PAGE);
 
-  // Pagination handlers
   const goToPage = (page) => {
     setCurrentPage(page);
   };
@@ -99,7 +89,6 @@ const Products = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
-  // Helper functions
   const getRatingColor = (rating) => {
     const score = rating * 20;
     if (score < 60) return "#ff4444";
@@ -118,7 +107,6 @@ const Products = () => {
       .replace(/-+/g, "-");
   };
 
-  // Format release date from YYYY-MM-DD to DD.MM.YYYY
   const formatReleaseDate = (dateString) => {
     if (!dateString || dateString === "Unknown") return "Unknown";
 
@@ -136,14 +124,12 @@ const Products = () => {
     }
   };
 
-  // Generate page numbers for pagination
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
-    // Adjust start page if we don't have enough pages at the end
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
@@ -158,7 +144,6 @@ const Products = () => {
     <>
       <Navbar />
 
-      {/* Page Header */}
       <div className="banner__image" id="BannerImage">
         <header>
           <div className="container info__container">
@@ -170,10 +155,8 @@ const Products = () => {
         </header>
       </div>
 
-      {/* Main Products Section */}
       <section className="products">
         <div className="container products__container">
-          {/* Genre Filter Buttons */}
           <div className="controls-wrapper">
             <div className="controls-container">
               <button
@@ -202,11 +185,9 @@ const Products = () => {
             </div>
           </div>
 
-          {/* Loading and Error States */}
           {loading && <p>Loading games...</p>}
           {error && <p className="error">{error}</p>}
 
-          {/* Games Grid */}
           <div className="cards" id="productsItems">
             {displayedGames.map((game) => {
               const primaryGenre = game.genres?.[0]?.name || "Unknown";
@@ -220,7 +201,6 @@ const Products = () => {
                   className="card"
                   style={{ position: "relative" }}
                 >
-                  {/* Game Image */}
                   <div className="card__image">
                     <Link to={`/products/${game.id}`}>
                       <img
@@ -234,7 +214,6 @@ const Products = () => {
                     </Link>
                   </div>
 
-                  {/* Game Content */}
                   <div className="card__content">
                     <p>
                       <span className="category">Category:</span> {primaryGenre}
@@ -246,7 +225,6 @@ const Products = () => {
                       <span className="date">Release Date:</span> {releaseDate}
                     </div>
 
-                    {/* Rating Badge */}
                     <span
                       className="rating-score"
                       style={{
@@ -267,7 +245,6 @@ const Products = () => {
                       {ratingScore}
                     </span>
 
-                    {/* Explore Button */}
                     <Link to={`/products/${game.id}`}>
                       <button className="btn card__btn">Explore</button>
                     </Link>
@@ -277,10 +254,8 @@ const Products = () => {
             })}
           </div>
 
-          {/* Pagination Controls */}
           {totalPages > 1 && (
             <div className="pagination">
-              {/* Previous Button */}
               <button
                 className="pagination__btn"
                 onClick={goToPreviousPage}
@@ -289,7 +264,6 @@ const Products = () => {
                 Previous
               </button>
 
-              {/* Page Numbers */}
               {getPageNumbers().map((page) => (
                 <button
                   key={page}
@@ -302,7 +276,6 @@ const Products = () => {
                 </button>
               ))}
 
-              {/* Next Button */}
               <button
                 className="pagination__btn"
                 onClick={goToNextPage}
@@ -311,7 +284,6 @@ const Products = () => {
                 Next
               </button>
 
-              {/* Pagination Info */}
               <div className="pagination__info">
                 Showing {(currentPage - 1) * GAMES_PER_PAGE + 1}-
                 {Math.min(currentPage * GAMES_PER_PAGE, filteredGames.length)}{" "}
