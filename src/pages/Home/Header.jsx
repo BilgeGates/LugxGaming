@@ -54,15 +54,20 @@ const Header = () => {
       const savedFavorites = localStorage.getItem("gameFavorites");
       const savedPinnedFavorites = localStorage.getItem("gamePinnedFavorites");
       const savedGameRatings = localStorage.getItem("gameRatings");
-      const savedSearchResults = localStorage.getItem("gameSearchResults");
-      if (savedSearchResults) {
-        setSearchResults(JSON.parse(savedSearchResults));
-        setShowResults(true);
+      const savedRecentViews = localStorage.getItem("gameRecentViews");
+
+      if (savedFavorites) {
+        setFavorites(JSON.parse(savedFavorites));
       }
-      if (savedFavorites) setFavorites(JSON.parse(savedFavorites));
-      if (savedPinnedFavorites)
+      if (savedPinnedFavorites) {
         setPinnedFavorites(JSON.parse(savedPinnedFavorites));
-      if (savedGameRatings) setGameRatings(JSON.parse(savedGameRatings));
+      }
+      if (savedGameRatings) {
+        setGameRatings(JSON.parse(savedGameRatings));
+      }
+      if (savedRecentViews) {
+        setRecentViews(JSON.parse(savedRecentViews));
+      }
     } catch (error) {
       console.error("localStorage oxuma xətası:", error);
     }
@@ -70,9 +75,11 @@ const Header = () => {
 
   useEffect(() => {
     fetchGames();
+
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
     }, 5000);
+
     return () => clearInterval(interval);
   }, []);
 
@@ -105,11 +112,11 @@ const Header = () => {
 
   useEffect(() => {
     try {
-      localStorage.setItem("gameSearchResults", JSON.stringify(searchResults));
+      localStorage.setItem("gameRecentViews", JSON.stringify(recentViews));
     } catch (error) {
-      console.error("SearchResults localStorage yazma xətası:", error);
+      console.error("RecentViews localStorage yazma xətası:", error);
     }
-  }, [searchResults]);
+  }, [recentViews]);
 
   const fetchGames = async () => {
     try {
@@ -135,6 +142,7 @@ const Header = () => {
 
     try {
       let searchURL = `https://api.rawg.io/api/games?key=${API_KEY}&page_size=15`;
+
       if (term.trim()) searchURL += `&search=${encodeURIComponent(term)}`;
       if (genre) searchURL += `&genres=${genre}`;
       if (sort === "rating") searchURL += `&ordering=-rating`;
@@ -147,6 +155,10 @@ const Header = () => {
 
       setSearchResults(results);
       setShowResults(true);
+
+      if (results.length > 0 && term.trim()) {
+        addSearchResultsToRecent(results.slice(0, 100)); // İlk 5 nəticəni əlavə et
+      }
     } catch (error) {
       console.error("Search error:", error);
       const localResults = allGames.filter(
@@ -159,9 +171,29 @@ const Header = () => {
       );
       setSearchResults(localResults);
       setShowResults(true);
+
+      if (localResults.length > 0 && term.trim()) {
+        addSearchResultsToRecent(localResults.slice(0, 100));
+      }
     } finally {
       setIsSearching(false);
     }
+  };
+
+  const addSearchResultsToRecent = (games) => {
+    games.forEach((game) => {
+      const gameData = {
+        id: game.id,
+        name: game.name,
+        background_image: game.background_image,
+        rating: game.rating,
+        released: game.released,
+        genres: game.genres || [],
+        metacritic: game.metacritic,
+        viewedAt: new Date().toISOString(),
+      };
+      addToRecentViews(gameData);
+    });
   };
 
   const clearSearch = () => {
