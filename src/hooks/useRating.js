@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 const useRating = () => {
   const [gameRatings, setGameRatings] = useState({});
 
-  const submitRating = (gameId, rating) => {
+  const submitRating = useCallback((gameId, rating) => {
     setGameRatings((prev) => ({
       ...prev,
       [gameId]: {
@@ -11,52 +11,27 @@ const useRating = () => {
         ratedAt: new Date().toISOString(),
       },
     }));
-  };
+  }, []);
 
-  const getUserRating = (gameId) => {
-    return gameRatings[gameId]?.rating || 0;
-  };
+  const getUserRating = useCallback(
+    (gameId) => {
+      return gameRatings[gameId]?.rating || 0;
+    },
+    [gameRatings]
+  );
 
-  const getRatingDate = (gameId) => {
-    return gameRatings[gameId]?.ratedAt || null;
-  };
-
-  const hasUserRated = (gameId) => {
-    return gameRatings[gameId] !== undefined;
-  };
-
-  const removeRating = (gameId) => {
-    setGameRatings((prev) => {
-      const { [gameId]: removed, ...rest } = prev;
-      return rest;
-    });
-  };
-
-  const getAllRatedGames = () => {
-    return Object.entries(gameRatings).map(([gameId, data]) => ({
-      gameId: parseInt(gameId),
-      ...data,
-    }));
-  };
-
-  const getAverageRating = () => {
-    const ratings = Object.values(gameRatings);
-    if (ratings.length === 0) return 0;
-
-    const sum = ratings.reduce((acc, curr) => acc + curr.rating, 0);
-    return (sum / ratings.length).toFixed(1);
-  };
+  const getRatingColor = useCallback((rating) => {
+    if (rating >= 4.5) return "text-green-500";
+    if (rating >= 4) return "text-yellow-500";
+    if (rating >= 3) return "text-orange-500";
+    return "text-red-500";
+  }, []);
 
   return {
     gameRatings,
     submitRating,
     getUserRating,
-    getRatingDate,
-    hasUserRated,
-    removeRating,
-    getAllRatedGames,
-    getAverageRating,
+    getRatingColor,
   };
 };
-
 export default useRating;

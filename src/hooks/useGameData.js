@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
 
-const API_KEY = "28dbf80fd39248b19263558419c182e3";
-const API_URL = `https://api.rawg.io/api/games?key=${API_KEY}&page_size=40`;
-
-export default function useGameData() {
+const useGameData = () => {
   const [allGames, setAllGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -12,16 +9,33 @@ export default function useGameData() {
   const [sortBy, setSortBy] = useState("relevance");
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
+  const [genres] = useState([
+    { id: "4", name: "Action" },
+    { id: "3", name: "Adventure" },
+    { id: "5", name: "RPG" },
+    { id: "10", name: "Strategy" },
+    { id: "2", name: "Shooter" },
+    { id: "40", name: "Casual" },
+    { id: "14", name: "Simulation" },
+    { id: "7", name: "Puzzle" },
+    { id: "11", name: "Arcade" },
+    { id: "83", name: "Platformer" },
+  ]);
+
+  const API_KEY = "28dbf80fd39248b19263558419c182e3";
 
   useEffect(() => {
     const fetchGames = async () => {
       setLoading(true);
       try {
-        const response = await fetch(API_URL);
+        const response = await fetch(
+          `https://api.rawg.io/api/games?key=${API_KEY}&page_size=40`
+        );
         const data = await response.json();
         setAllGames(data.results || []);
       } catch (err) {
         console.error("Error fetching games:", err);
+        setAllGames([]);
       } finally {
         setLoading(false);
       }
@@ -37,7 +51,6 @@ export default function useGameData() {
     }
     try {
       let url = `https://api.rawg.io/api/games?key=${API_KEY}&page_size=15`;
-
       if (term.trim()) url += `&search=${encodeURIComponent(term)}`;
       if (genre) url += `&genres=${genre}`;
       if (sort === "rating") url += `&ordering=-rating`;
@@ -64,6 +77,22 @@ export default function useGameData() {
     setShowFilters(false);
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).getFullYear();
+  };
+
+  const formatTimeAgo = (dateString) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `${diffInDays}d ago`;
+  };
+
   return {
     allGames,
     loading,
@@ -80,5 +109,10 @@ export default function useGameData() {
     setShowResults,
     searchGames,
     clearSearch,
+    genres,
+    formatDate,
+    formatTimeAgo,
   };
-}
+};
+
+export default useGameData;
