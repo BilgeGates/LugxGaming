@@ -92,7 +92,6 @@ const Header = () => {
         <div className="absolute bottom-10 right-10 w-12 h-12 bg-green-500 rounded-full animate-spin"></div>
       </div>
 
-      {/* Modals */}
       <RatingModal
         isOpen={showRatingModal}
         onClose={() => setShowRatingModal(false)}

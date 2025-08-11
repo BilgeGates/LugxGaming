@@ -3,85 +3,82 @@ import { useState, useEffect } from "react";
 const API_KEY = "28dbf80fd39248b19263558419c182e3";
 const API_URL = `https://api.rawg.io/api/games?key=${API_KEY}&page_size=40`;
 
-const useGameData = () => {
+export default function useGameData() {
   const [allGames, setAllGames] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isSearching, setIsSearching] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedGenre, setSelectedGenre] = useState("");
+  const [sortBy, setSortBy] = useState("relevance");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showResults, setShowResults] = useState(false);
 
-  const fetchGames = async () => {
-    try {
+  useEffect(() => {
+    const fetchGames = async () => {
       setLoading(true);
-      const response = await fetch(API_URL);
-      const data = await response.json();
-      setAllGames(data.results || []);
-    } catch (error) {
-      console.error("API error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        setAllGames(data.results || []);
+      } catch (err) {
+        console.error("Error fetching games:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchGames();
+  }, []);
 
   const searchGames = async (term, genre = "", sort = "relevance") => {
     if (term.trim() === "" && genre === "") {
       setSearchResults([]);
+      setShowResults(false);
       return;
     }
-
-    setIsSearching(true);
-
     try {
-      let searchURL = `https://api.rawg.io/api/games?key=${API_KEY}&page_size=15`;
+      let url = `https://api.rawg.io/api/games?key=${API_KEY}&page_size=15`;
 
-      if (term.trim()) {
-        searchURL += `&search=${encodeURIComponent(term)}`;
-      }
+      if (term.trim()) url += `&search=${encodeURIComponent(term)}`;
+      if (genre) url += `&genres=${genre}`;
+      if (sort === "rating") url += `&ordering=-rating`;
+      else if (sort === "released") url += `&ordering=-released`;
+      else if (sort === "metacritic") url += `&ordering=-metacritic`;
 
-      if (genre) {
-        searchURL += `&genres=${genre}`;
-      }
-
-      if (sort === "rating") {
-        searchURL += `&ordering=-rating`;
-      } else if (sort === "released") {
-        searchURL += `&ordering=-released`;
-      } else if (sort === "metacritic") {
-        searchURL += `&ordering=-metacritic`;
-      }
-
-      const response = await fetch(searchURL);
+      const response = await fetch(url);
       const data = await response.json();
-
       setSearchResults(data.results || []);
+      setShowResults(true);
     } catch (error) {
       console.error("Search error:", error);
-      const localResults = allGames.filter(
-        (game) =>
-          game.name.toLowerCase().includes(term.toLowerCase()) ||
-          (game.genres &&
-            game.genres.some((genre) =>
-              genre.name.toLowerCase().includes(term.toLowerCase())
-            ))
-      );
-      setSearchResults(localResults);
-    } finally {
-      setIsSearching(false);
+      setSearchResults([]);
+      setShowResults(false);
     }
   };
 
-  useEffect(() => {
-    fetchGames();
-  }, []);
+  const clearSearch = () => {
+    setSearchTerm("");
+    setSelectedGenre("");
+    setSortBy("relevance");
+    setSearchResults([]);
+    setShowResults(false);
+    setShowFilters(false);
+  };
 
   return {
     allGames,
-    searchResults,
     loading,
-    isSearching,
-    fetchGames,
+    searchTerm,
+    setSearchTerm,
+    showFilters,
+    setShowFilters,
+    selectedGenre,
+    setSelectedGenre,
+    sortBy,
+    setSortBy,
+    searchResults,
+    showResults,
+    setShowResults,
     searchGames,
-    setSearchResults,
+    clearSearch,
   };
-};
-
-export default useGameData;
+}
