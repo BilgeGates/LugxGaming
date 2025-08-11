@@ -19,8 +19,8 @@ import {
   Award,
   ChevronRight,
 } from "lucide-react";
-import Navbar from "../../components/Navbar/Navbar";
-import Footer from "../../components/Footer/Footer";
+import Navbar from "../../layout/Navbar/Navbar";
+import Footer from "../../layout/Footer/Footer";
 
 const API_KEY = "28dbf80fd39248b19263558419c182e3";
 
