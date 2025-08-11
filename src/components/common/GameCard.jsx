@@ -45,7 +45,7 @@ const GameCard = ({
   };
 
   return (
-    <div className={cardClasses[variant]}>
+    <div className={cardClasses[variant]} onClick={() => onSelect(game)}>
       {variant === "favorites" && isPinned && (
         <Pin size={16} className="text-yellow-500" fill="currentColor" />
       )}
@@ -64,7 +64,8 @@ const GameCard = ({
         }}
       />
 
-      <div className="flex-1 cursor-pointer" onClick={() => onSelect(game)}>
+      {/* Oyunun adı, janrı, rating və tarix */}
+      <div className="flex-1 cursor-pointer">
         <h4
           className={`font-semibold transition-colors ${
             variant === "search"
@@ -87,14 +88,14 @@ const GameCard = ({
             </span>
           )}
 
-          {game.rating && (
+          {game.rating !== undefined && game.rating !== null && (
             <span
               className={`flex items-center gap-1 ${getRatingColor(
                 game.rating
               )}`}
             >
               <Star size={12} />
-              {game.rating}
+              {game.rating.toFixed(1)}
             </span>
           )}
 
@@ -116,6 +117,7 @@ const GameCard = ({
             }}
             className="p-2 rounded-full text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 transition-colors"
             title="Rate this game"
+            aria-label="Rate this game"
           >
             <Star
               size={16}
@@ -123,7 +125,6 @@ const GameCard = ({
               className={userRating > 0 ? "text-yellow-500" : ""}
             />
           </button>
-
           {showPin && (
             <button
               onClick={(e) => {
@@ -136,11 +137,11 @@ const GameCard = ({
                   : "text-gray-400 hover:text-yellow-500 hover:bg-yellow-50"
               }`}
               title={isPinned ? "Unpin from top" : "Pin to top"}
+              aria-label={isPinned ? "Unpin game" : "Pin game"}
             >
               <Pin size={16} fill={isPinned ? "currentColor" : "none"} />
             </button>
           )}
-
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -152,10 +153,12 @@ const GameCard = ({
                 : "text-gray-400 hover:text-red-500"
             } hover:bg-red-50`}
             title={isFavorited ? "Remove from favorites" : "Add to favorites"}
+            aria-label={
+              isFavorited ? "Remove from favorites" : "Add to favorites"
+            }
           >
             <Heart size={16} fill={isFavorited ? "currentColor" : "none"} />
           </button>
-
           {showRemove && (
             <button
               onClick={(e) => {
@@ -164,27 +167,29 @@ const GameCard = ({
               }}
               className="p-2 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
               title="Remove from favorites"
+              aria-label="Remove from favorites"
             >
               <Trash2 size={16} />
             </button>
           )}
-
           {userRating > 0 && (
-            <div className="flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">
+            <div className="flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs select-none">
               <Star size={12} fill="currentColor" />
-              {userRating}
+              {userRating.toFixed(1)}
             </div>
           )}
-
-          {game.metacritic && (
+          ğ{" "}
+          {game.metacritic !== undefined && game.metacritic !== null && (
             <div
-              className={`text-xs px-2 py-1 rounded-full ${
+              className={`text-xs px-2 py-1 rounded-full select-none ${
                 game.metacritic >= 80
                   ? "bg-green-100 text-green-800"
                   : game.metacritic >= 60
                   ? "bg-yellow-100 text-yellow-800"
                   : "bg-red-100 text-red-800"
               }`}
+              title={`Metacritic Score: ${game.metacritic}`}
+              aria-label={`Metacritic Score: ${game.metacritic}`}
             >
               {game.metacritic}
             </div>
