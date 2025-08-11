@@ -1,6 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import SearchBar from "../../components/common/SearchBar";
 import { Gamepad2, Star, Users } from "lucide-react";
+
+const heroImages = [
+  "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&h=400&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&h=400&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=600&h=400&fit=crop&crop=center",
+];
 
 const HeroSection = ({
   allGames,
@@ -28,21 +34,15 @@ const HeroSection = ({
   isGameFavorited,
   formatDate,
 }) => {
-  const heroImages = [
-    "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&h=400&fit=crop&crop=center",
-    "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&h=400&fit=crop&crop=center",
-    "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=600&h=400&fit=crop&crop=center",
-  ];
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
-
-  React.useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [heroImages.length]);
+  }, []);
 
   return (
     <header className="relative z-10 pt-20">
@@ -149,6 +149,7 @@ const HeroSection = ({
                         ? "bg-white"
                         : "bg-white bg-opacity-50"
                     }`}
+                    aria-label={`Show hero image ${index + 1}`}
                   />
                 ))}
               </div>

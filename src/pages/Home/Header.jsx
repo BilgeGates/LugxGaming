@@ -50,7 +50,7 @@ const Header = () => {
   const stats = [
     {
       icon: TrendingUp,
-      label: `${gameData.allGames.length} games`,
+      label: `${gameData.allGames?.length ?? 0} games`,
       color: "text-cyan-400",
     },
     {
@@ -60,14 +60,14 @@ const Header = () => {
     },
     {
       icon: Heart,
-      label: `${favorites.favorites.length} favorites`,
+      label: `${favorites.favorites?.length ?? 0} favorites`,
       color: "text-red-400",
       onClick: () => setShowFavoritesModal(true),
       clickable: true,
     },
     {
       icon: Search,
-      label: `${recentViews.recentViews.length} recent`,
+      label: `${recentViews.recentViews?.length ?? 0} recent`,
       color: "text-blue-400",
       onClick: () => setShowRecentModal(true),
       clickable: true,
