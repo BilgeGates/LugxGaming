@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Gamepad2, Star, Users, TrendingUp, Heart, Search } from "lucide-react";
 
-import SearchBar from "./SearchBar";
-import FavoritesModal from "./FavoritesModal";
+import SearchBar from "../../components/common/SearchBar";
+import FavoritesModal from "../../components/common/FavoritesModal";
 import RecentModal from "./RecentModal";
-import RatingModal from "./RatingModal";
+import RatingModal from "../../components/common/RatingModal";
 
 const API_KEY = "28dbf80fd39248b19263558419c182e3";
 const API_URL = `https://api.rawg.io/api/games?key=${API_KEY}&page_size=40`;
@@ -50,14 +50,66 @@ const Header = () => {
   ];
 
   useEffect(() => {
-    fetchGames();
+    try {
+      const savedFavorites = localStorage.getItem("gameFavorites");
+      const savedPinnedFavorites = localStorage.getItem("gamePinnedFavorites");
+      const savedGameRatings = localStorage.getItem("gameRatings");
+      const savedSearchResults = localStorage.getItem("gameSearchResults");
+      if (savedSearchResults) {
+        setSearchResults(JSON.parse(savedSearchResults));
+        setShowResults(true);
+      }
+      if (savedFavorites) setFavorites(JSON.parse(savedFavorites));
+      if (savedPinnedFavorites)
+        setPinnedFavorites(JSON.parse(savedPinnedFavorites));
+      if (savedGameRatings) setGameRatings(JSON.parse(savedGameRatings));
+    } catch (error) {
+      console.error("localStorage oxuma xətası:", error);
+    }
+  }, []);
 
+  useEffect(() => {
+    fetchGames();
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
     }, 5000);
-
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("gameFavorites", JSON.stringify(favorites));
+    } catch (error) {
+      console.error("Favorites localStorage yazma xətası:", error);
+    }
+  }, [favorites]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        "gamePinnedFavorites",
+        JSON.stringify(pinnedFavorites)
+      );
+    } catch (error) {
+      console.error("PinnedFavorites localStorage yazma xətası:", error);
+    }
+  }, [pinnedFavorites]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("gameRatings", JSON.stringify(gameRatings));
+    } catch (error) {
+      console.error("GameRatings localStorage yazma xətası:", error);
+    }
+  }, [gameRatings]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("gameSearchResults", JSON.stringify(searchResults));
+    } catch (error) {
+      console.error("SearchResults localStorage yazma xətası:", error);
+    }
+  }, [searchResults]);
 
   const fetchGames = async () => {
     try {
@@ -83,7 +135,6 @@ const Header = () => {
 
     try {
       let searchURL = `https://api.rawg.io/api/games?key=${API_KEY}&page_size=15`;
-
       if (term.trim()) searchURL += `&search=${encodeURIComponent(term)}`;
       if (genre) searchURL += `&genres=${genre}`;
       if (sort === "rating") searchURL += `&ordering=-rating`;
@@ -92,8 +143,9 @@ const Header = () => {
 
       const response = await fetch(searchURL);
       const data = await response.json();
+      const results = data.results || [];
 
-      setSearchResults(data.results || []);
+      setSearchResults(results);
       setShowResults(true);
     } catch (error) {
       console.error("Search error:", error);
@@ -142,10 +194,18 @@ const Header = () => {
   const addToRecentViews = (gameData) => {
     setRecentViews((prev) => {
       const filtered = prev.filter((item) => item.id !== gameData.id);
-      return [gameData, ...filtered].slice(0, 10);
+      return [gameData, ...filtered].slice(0, 20);
     });
   };
-  const clearRecentViews = () => setRecentViews([]);
+
+  const clearRecentViews = () => {
+    setRecentViews([]);
+    try {
+      localStorage.removeItem("gameRecentViews");
+    } catch (error) {
+      console.error("RecentViews localStorage silmə xətası:", error);
+    }
+  };
 
   const toggleFavorite = (game) => {
     const gameId = typeof game === "object" ? game.id : game;
@@ -167,6 +227,7 @@ const Header = () => {
       }
     });
   };
+
   const togglePin = (gameId) => {
     const game = favorites.find((fav) => fav.id === gameId);
     if (!game) return;
@@ -175,6 +236,7 @@ const Header = () => {
       return exists ? prev.filter((pin) => pin.id !== gameId) : [...prev, game];
     });
   };
+
   const removeFavorite = (gameId) => {
     setFavorites((prev) => prev.filter((fav) => fav.id !== gameId));
     setPinnedFavorites((prev) => prev.filter((pin) => pin.id !== gameId));
@@ -185,13 +247,16 @@ const Header = () => {
     setRatingGameData(game);
     setShowRatingModal(true);
   };
+
   const getUserRating = (gameId) => gameRatings[gameId]?.rating || 0;
+
   const getRatingColor = (rating) => {
     if (rating >= 4.5) return "text-green-500";
     if (rating >= 4) return "text-yellow-500";
     if (rating >= 3) return "text-orange-500";
     return "text-red-500";
   };
+
   const formatTimeAgo = (dateString) => {
     const now = new Date();
     const date = new Date(dateString);
@@ -202,6 +267,7 @@ const Header = () => {
     const diffInDays = Math.floor(diffInHours / 24);
     return `${diffInDays}d ago`;
   };
+
   const formatDate = (dateString) =>
     dateString ? new Date(dateString).getFullYear() : "N/A";
 
@@ -223,7 +289,6 @@ const Header = () => {
       label: `${allGames.length} games`,
       color: "text-cyan-400",
     },
-    { icon: Star, label: "RAWG DB", color: "text-yellow-400" },
     {
       icon: Heart,
       label: `${favorites.length} favorites`,

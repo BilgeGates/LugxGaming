@@ -1,21 +1,17 @@
 import React, { useRef, useEffect } from "react";
-import { Heart, Pin, Trash2, Gamepad2, Star, Calendar, X } from "lucide-react";
+import { Search, Gamepad2, Calendar, Star, Heart, X } from "lucide-react";
 
-const FavoritesModal = ({
+const RecentModal = ({
   show,
   onClose,
-  favorites,
-  pinnedFavorites,
-  toggleFavorite,
-  togglePin,
-  removeFavorite,
+  recentViews,
+  clearRecentViews,
   handleGameSelect,
-  getSortedFavorites,
-  isGamePinned,
+  formatTimeAgo,
   getUserRating,
   openRatingModal,
-  getRatingColor,
-  formatDate,
+  toggleFavorite,
+  isGameFavorited,
 }) => {
   const modalRef = useRef(null);
 
@@ -37,55 +33,52 @@ const FavoritesModal = ({
         ref={modalRef}
         className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden"
       >
-        {/* Header */}
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6">
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Heart className="text-red-300" size={24} fill="currentColor" />
-              <h2 className="text-2xl font-bold">My Favorites</h2>
+              <Search className="text-blue-300" size={24} />
+              <h2 className="text-2xl font-bold">Recent Views</h2>
               <span className="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm">
-                {favorites.length} games
+                {recentViews.length} games
               </span>
             </div>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors"
-            >
-              <X size={20} />
-            </button>
+            <div className="flex items-center gap-2">
+              {recentViews.length > 0 && (
+                <button
+                  onClick={clearRecentViews}
+                  className="px-3 py-2 bg-white bg-opacity-20 rounded-lg text-sm hover:bg-opacity-30 transition-colors"
+                >
+                  Clear All
+                </button>
+              )}
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
           </div>
         </div>
 
         <div className="p-6">
-          {favorites.length === 0 ? (
+          {recentViews.length === 0 ? (
             <div className="text-center py-12">
-              <Heart size={64} className="mx-auto text-gray-300 mb-4" />
+              <Search size={64} className="mx-auto text-gray-300 mb-4" />
               <h3 className="text-xl font-semibold text-gray-600 mb-2">
-                No favorites yet
+                No recent views
               </h3>
               <p className="text-gray-500">
-                Start adding games to your favorites by clicking the heart icon!
+                Games you view will appear here for quick access!
               </p>
             </div>
           ) : (
             <div className="space-y-3 max-h-96 overflow-y-auto">
-              {getSortedFavorites().map((game) => (
+              {recentViews.map((game) => (
                 <div
-                  key={game.id}
-                  className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-200 ${
-                    isGamePinned(game.id)
-                      ? "bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-400"
-                      : "bg-gray-50 hover:bg-gray-100"
-                  }`}
+                  key={`${game.id}-${game.viewedAt}`}
+                  className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
                 >
-                  {isGamePinned(game.id) && (
-                    <Pin
-                      size={16}
-                      className="text-yellow-500"
-                      fill="currentColor"
-                    />
-                  )}
-
                   <img
                     src={
                       game.background_image ||
@@ -103,7 +96,7 @@ const FavoritesModal = ({
                     className="flex-1 cursor-pointer"
                     onClick={() => handleGameSelect(game)}
                   >
-                    <h4 className="font-semibold text-gray-800 hover:text-purple-600 transition-colors">
+                    <h4 className="font-semibold text-gray-800 hover:text-blue-600 transition-colors">
                       {game.name}
                     </h4>
                     <div className="flex items-center gap-3 text-sm text-gray-600 mt-1">
@@ -113,19 +106,9 @@ const FavoritesModal = ({
                           {game.genres[0].name}
                         </span>
                       )}
-                      {game.rating && (
-                        <span
-                          className={`flex items-center gap-1 ${getRatingColor(
-                            game.rating
-                          )}`}
-                        >
-                          <Star size={12} />
-                          {game.rating}
-                        </span>
-                      )}
                       <span className="flex items-center gap-1">
                         <Calendar size={12} />
-                        {formatDate(game.released)}
+                        Viewed {formatTimeAgo(game.viewedAt)}
                       </span>
                     </div>
                   </div>
@@ -146,45 +129,30 @@ const FavoritesModal = ({
                         }
                       />
                     </button>
-
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        togglePin(game.id);
+                        toggleFavorite(game);
                       }}
                       className={`p-2 rounded-full transition-colors ${
-                        isGamePinned(game.id)
-                          ? "text-yellow-500 bg-yellow-50 hover:bg-yellow-100"
-                          : "text-gray-400 hover:text-yellow-500 hover:bg-yellow-50"
+                        isGameFavorited(game.id)
+                          ? "text-red-500 hover:text-red-600"
+                          : "text-gray-400 hover:text-red-500"
                       }`}
-                      title={
-                        isGamePinned(game.id) ? "Unpin from top" : "Pin to top"
-                      }
                     >
-                      <Pin
+                      <Heart
                         size={16}
-                        fill={isGamePinned(game.id) ? "currentColor" : "none"}
+                        fill={
+                          isGameFavorited(game.id) ? "currentColor" : "none"
+                        }
                       />
                     </button>
-
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeFavorite(game.id);
-                      }}
-                      className="p-2 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                      title="Remove from favorites"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-
                     {getUserRating(game.id) > 0 && (
                       <div className="flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">
                         <Star size={12} fill="currentColor" />
                         {getUserRating(game.id)}
                       </div>
                     )}
-
                     {game.metacritic && (
                       <div
                         className={`text-xs px-2 py-1 rounded-full ${
@@ -209,4 +177,4 @@ const FavoritesModal = ({
   );
 };
 
-export default FavoritesModal;
+export default RecentModal;

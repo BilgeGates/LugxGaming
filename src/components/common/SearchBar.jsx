@@ -56,7 +56,7 @@ const SearchBar = ({
   };
 
   return (
-    <div className="relative" ref={searchRef}>
+    <div className="relative max-w-4xl" ref={searchRef}>
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
@@ -150,7 +150,7 @@ const SearchBar = ({
 
       {showResults && (
         <div
-          className="absolute top-full left-0 right-0 mt-2 rounded-xl shadow-2xl max-h-96 overflow-y-auto z-50 border"
+          className="absolute top-full left-0 right-0 mt-2 rounded-xl shadow-2xl overflow-y-auto z-50 max-h-screen border"
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.95)",
             backdropFilter: "blur(10px)",
@@ -174,6 +174,7 @@ const SearchBar = ({
                   <div
                     key={game.id}
                     className="flex items-center gap-4 p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors group"
+                    onClick={() => handleGameSelect(game)} // 🔹 bütün kart klikində işləyir
                   >
                     <img
                       src={
@@ -188,10 +189,7 @@ const SearchBar = ({
                       }}
                     />
 
-                    <div
-                      className="flex-1"
-                      onClick={() => handleGameSelect(game)}
-                    >
+                    <div className="flex-1">
                       <h4 className="font-semibold text-gray-800 group-hover:text-purple-600 transition-colors">
                         {game.name}
                       </h4>
@@ -221,7 +219,10 @@ const SearchBar = ({
 
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={(e) => openRatingModal(game, e)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openRatingModal(game, e);
+                        }}
                         className="p-1 rounded-full text-gray-400 hover:text-yellow-500 transition-colors"
                         title="Rate this game"
                       >
