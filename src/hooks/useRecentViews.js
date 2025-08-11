@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 const useRecentViews = () => {
   const [recentViews, setRecentViews] = useState([]);
 
-  const addToRecentViews = (gameData) => {
+  const addToRecentViews = useCallback((gameData) => {
     const processedGame = {
       id: gameData.id,
       name: gameData.name,
@@ -17,32 +17,18 @@ const useRecentViews = () => {
 
     setRecentViews((prev) => {
       const filtered = prev.filter((item) => item.id !== gameData.id);
-      const newRecentViews = [processedGame, ...filtered];
-      return newRecentViews.slice(0, 40);
+      return [processedGame, ...filtered].slice(0, 40);
     });
-  };
+  }, []);
 
-  const clearRecentViews = () => {
+  const clearRecentViews = useCallback(() => {
     setRecentViews([]);
-  };
-
-  const formatTimeAgo = (dateString) => {
-    const now = new Date();
-    const date = new Date(dateString);
-    const diffInMinutes = Math.floor((now - date) / (1000 * 60));
-
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    const diffInDays = Math.floor(diffInHours / 24);
-    return `${diffInDays}d ago`;
-  };
+  }, []);
 
   return {
     recentViews,
     addToRecentViews,
     clearRecentViews,
-    formatTimeAgo,
   };
 };
 
