@@ -1,12 +1,12 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useCallback, useState } from "react";
 import {
   Search,
   X,
   Filter,
   Gamepad2,
   Star,
-  Calendar,
   Heart,
+  Calendar,
 } from "lucide-react";
 
 const SearchBar = ({
@@ -18,10 +18,10 @@ const SearchBar = ({
   setSelectedGenre,
   sortBy,
   setSortBy,
-  genres,
+  genres = [],
   handleSearch,
   clearSearch,
-  searchResults,
+  searchResults = [],
   showResults,
   setShowResults,
   handleGameSelect,
@@ -33,26 +33,171 @@ const SearchBar = ({
   formatDate,
 }) => {
   const searchRef = useRef(null);
+  const searchTimeoutRef = useRef(null);
+  const [selectedResultIndex, setSelectedResultIndex] = useState(-1);
+
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setShowResults(false);
         setShowFilters(false);
+        setSelectedResultIndex(-1);
       }
     };
+
+    const handleKeyDown = (event) => {
+      if (!showResults || searchResults.length === 0) return;
+
+      // eslint-disable-next-line default-case
+      switch (event.key) {
+        case "Escape":
+          setShowResults(false);
+          setSelectedResultIndex(-1);
+          break;
+        case "ArrowDown":
+          event.preventDefault();
+          setSelectedResultIndex((prev) =>
+            prev < searchResults.length - 1 ? prev + 1 : prev
+          );
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          setSelectedResultIndex((prev) => (prev > 0 ? prev - 1 : -1));
+          break;
+        case "Enter":
+          event.preventDefault();
+          if (selectedResultIndex >= 0) {
+            handleGameSelect(searchResults[selectedResultIndex]);
+            setShowResults(false);
+            setSelectedResultIndex(-1);
+          }
+          break;
+      }
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [setShowResults, setShowFilters]);
+    document.addEventListener("keydown", handleKeyDown);
 
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [
+    setShowResults,
+    setShowFilters,
+    showResults,
+    searchResults,
+    selectedResultIndex,
+    handleGameSelect,
+  ]);
 
-    clearTimeout(window.searchTimeout);
-    window.searchTimeout = setTimeout(() => {
-      handleSearch(value, selectedGenre, sortBy);
-    }, 500);
+  const debouncedSearch = useCallback(
+    (value, genre, sort) => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+
+      searchTimeoutRef.current = setTimeout(() => {
+        if (handleSearch) {
+          handleSearch(value, genre, sort);
+        }
+      }, 300);
+    },
+    [handleSearch]
+  );
+
+  const handleInputChange = useCallback(
+    (e) => {
+      const value = e.target.value;
+      setSearchTerm(value);
+      setSelectedResultIndex(-1);
+
+      if (value.trim()) {
+        setShowResults(true);
+        debouncedSearch(value, selectedGenre, sortBy);
+      } else {
+        setShowResults(false);
+      }
+    },
+    [setSearchTerm, selectedGenre, sortBy, debouncedSearch, setShowResults]
+  );
+
+  const handleClearSearch = useCallback(() => {
+    if (clearSearch) {
+      clearSearch();
+    }
+    setShowResults(false);
+    setSelectedResultIndex(-1);
+  }, [clearSearch, setShowResults]);
+
+  const handleFilterChange = useCallback(
+    (filterType, value) => {
+      if (filterType === "genre") {
+        setSelectedGenre(value);
+      } else if (filterType === "sort") {
+        setSortBy(value);
+      }
+
+      if (searchTerm.trim()) {
+        debouncedSearch(
+          searchTerm,
+          filterType === "genre" ? value : selectedGenre,
+          filterType === "sort" ? value : sortBy
+        );
+      }
+    },
+    [
+      searchTerm,
+      selectedGenre,
+      sortBy,
+      setSelectedGenre,
+      setSortBy,
+      debouncedSearch,
+    ]
+  );
+
+  const handleResultClick = useCallback(
+    (game) => {
+      handleGameSelect(game);
+      setShowResults(false);
+      setSelectedResultIndex(-1);
+    },
+    [handleGameSelect, setShowResults]
+  );
+
+  const safeGetRatingColor = (rating) => {
+    try {
+      return getRatingColor ? getRatingColor(rating) : "text-gray-500";
+    } catch (error) {
+      console.warn("Error getting rating color:", error);
+      return "text-gray-500";
+    }
+  };
+
+  const safeGetUserRating = (gameId) => {
+    try {
+      return getUserRating ? getUserRating(gameId) : 0;
+    } catch (error) {
+      console.warn("Error getting user rating:", error);
+      return 0;
+    }
+  };
+
+  const safeIsGameFavorited = (gameId) => {
+    try {
+      return isGameFavorited ? isGameFavorited(gameId) : false;
+    } catch (error) {
+      console.warn("Error checking if game is favorited:", error);
+      return false;
+    }
   };
 
   return (
@@ -75,20 +220,28 @@ const SearchBar = ({
                 backdropFilter: "blur(10px)",
                 borderColor: "rgba(255, 255, 255, 0.2)",
               }}
+              aria-label="Search games"
+              autoComplete="off"
             />
             {searchTerm && (
               <button
-                onClick={clearSearch}
+                onClick={handleClearSearch}
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                aria-label="Clear search"
               >
                 <X size={20} />
               </button>
             )}
           </div>
-
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="px-4 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition-colors"
+            className={`px-4 py-4 rounded-xl transition-colors ${
+              showFilters
+                ? "bg-purple-700 text-white"
+                : "bg-purple-600 hover:bg-purple-700 text-white"
+            }`}
+            aria-label={showFilters ? "Hide filters" : "Show filters"}
+            aria-expanded={showFilters}
           >
             <Filter size={20} />
           </button>
@@ -102,19 +255,22 @@ const SearchBar = ({
               backdropFilter: "blur(10px)",
               borderColor: "rgba(255, 255, 255, 0.2)",
             }}
+            role="region"
+            aria-label="Search filters"
           >
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
-                <label className="block text-sm text-gray-300 mb-1">
+                <label
+                  htmlFor="genre-select"
+                  className="block text-sm text-gray-300 mb-1"
+                >
                   Genre
                 </label>
                 <select
+                  id="genre-select"
                   value={selectedGenre}
-                  onChange={(e) => {
-                    setSelectedGenre(e.target.value);
-                    handleSearch(searchTerm, e.target.value, sortBy);
-                  }}
-                  className="w-full px-3 py-2 rounded-lg bg-black bg-opacity-20 text-white border border-white border-opacity-20"
+                  onChange={(e) => handleFilterChange("genre", e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg text-gray-900 bg-white bg-opacity-90 border border-white border-opacity-20 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
                   <option value="">All Genres</option>
                   {genres.map((genre) => (
@@ -124,18 +280,18 @@ const SearchBar = ({
                   ))}
                 </select>
               </div>
-
               <div className="flex-1">
-                <label className="block text-sm text-gray-300 mb-1">
+                <label
+                  htmlFor="sort-select"
+                  className="block text-sm text-gray-300 mb-1"
+                >
                   Sort By
                 </label>
                 <select
+                  id="sort-select"
                   value={sortBy}
-                  onChange={(e) => {
-                    setSortBy(e.target.value);
-                    handleSearch(searchTerm, selectedGenre, e.target.value);
-                  }}
-                  className="w-full px-3 py-2 rounded-lg bg-black bg-opacity-20 text-white border border-white border-opacity-20"
+                  onChange={(e) => handleFilterChange("sort", e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg text-gray-900 bg-white bg-opacity-90 border border-white border-opacity-20 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
                   <option value="relevance">Relevance</option>
                   <option value="rating">Rating</option>
@@ -148,144 +304,137 @@ const SearchBar = ({
         )}
       </div>
 
-      {showResults && (
+      {showResults && searchTerm.trim() && (
         <div
-          className="absolute top-full left-0 right-0 mt-2 rounded-xl shadow-2xl overflow-y-auto z-50 max-h-screen border"
+          className="absolute top-full left-0 right-0 mt-2 rounded-xl shadow-2xl overflow-y-auto z-50 max-h-96 border"
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.95)",
             backdropFilter: "blur(10px)",
             borderColor: "rgba(255, 255, 255, 0.2)",
           }}
+          role="listbox"
+          aria-label="Search results"
         >
           {searchResults.length > 0 ? (
             <div className="p-4">
               <h3 className="text-gray-800 font-semibold mb-3 flex items-center gap-2">
                 <Search size={16} />
                 Found {searchResults.length} games
-                {selectedGenre && (
-                  <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full">
-                    {genres.find((g) => g.id === selectedGenre)?.name}
-                  </span>
-                )}
               </h3>
+              <div className="space-y-1">
+                {searchResults.map((game, index) => {
+                  if (!game || !game.id) return null;
 
-              <div className="space-y-3">
-                {searchResults.map((game) => (
-                  <div
-                    key={game.id}
-                    className="flex items-center gap-4 p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors group"
-                    onClick={() => handleGameSelect(game)} // 🔹 bütün kart klikində işləyir
-                  >
-                    <img
-                      src={
-                        game.background_image ||
-                        "https://via.placeholder.com/64x40?text=No+Image"
-                      }
-                      alt={game.name}
-                      className="w-16 h-10 object-cover rounded-md"
-                      onError={(e) => {
-                        e.target.src =
-                          "https://via.placeholder.com/64x40?text=No+Image";
-                      }}
-                    />
-
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-800 group-hover:text-purple-600 transition-colors">
-                        {game.name}
-                      </h4>
-                      <div className="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
-                        {game.genres && game.genres.length > 0 && (
-                          <span className="flex items-center gap-1">
-                            <Gamepad2 size={14} />
-                            {game.genres[0].name}
-                          </span>
+                  return (
+                    <div
+                      key={game.id}
+                      className={`flex items-center gap-4 p-3 rounded-lg cursor-pointer transition-colors group ${
+                        selectedResultIndex === index
+                          ? "bg-purple-100 border border-purple-300"
+                          : "hover:bg-gray-100"
+                      }`}
+                      onClick={() => handleResultClick(game)}
+                      role="option"
+                      aria-selected={selectedResultIndex === index}
+                    >
+                      <img
+                        src={
+                          game.background_image ||
+                          "https://via.placeholder.com/64x40?text=No+Image"
+                        }
+                        alt={game.name || "Game image"}
+                        className="w-16 h-10 object-cover rounded-md shadow-sm"
+                        onError={(e) => {
+                          e.target.src =
+                            "https://via.placeholder.com/64x40?text=No+Image";
+                        }}
+                      />
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-800 group-hover:text-purple-600 transition-colors">
+                          {game.name || "Unknown Game"}
+                        </h4>
+                        <div className="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
+                          {game.genres && game.genres.length > 0 && (
+                            <span className="flex items-center gap-1">
+                              <Gamepad2 size={14} />
+                              {game.genres[0].name}
+                            </span>
+                          )}
+                          {game.rating > 0 && (
+                            <span
+                              className={`flex items-center gap-1 ${safeGetRatingColor(
+                                game.rating
+                              )}`}
+                            >
+                              <Star size={14} />
+                              {game.rating.toFixed(1)}
+                            </span>
+                          )}
+                          {game.released && (
+                            <span className="flex items-center gap-1">
+                              <Calendar size={14} />
+                              {formatDate
+                                ? formatDate(game.released)
+                                : new Date(game.released).getFullYear()}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {safeGetUserRating(game.id) > 0 && (
+                          <div className="flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">
+                            <Star size={12} fill="currentColor" />
+                            {safeGetUserRating(game.id).toFixed(1)}
+                          </div>
                         )}
-                        {game.rating && (
-                          <span
-                            className={`flex items-center gap-1 ${getRatingColor(
-                              game.rating
-                            )}`}
-                          >
-                            <Star size={14} />
-                            {game.rating}
-                          </span>
-                        )}
-                        <span className="flex items-center gap-1">
-                          <Calendar size={14} />
-                          {formatDate(game.released)}
-                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (toggleFavorite) {
+                              toggleFavorite(game);
+                            }
+                          }}
+                          className={`p-2 rounded-full transition-colors ${
+                            safeIsGameFavorited(game.id)
+                              ? "text-red-500 hover:text-red-600 bg-red-50"
+                              : "text-gray-400 hover:text-red-500 hover:bg-red-50"
+                          }`}
+                          title={
+                            safeIsGameFavorited(game.id)
+                              ? "Remove from favorites"
+                              : "Add to favorites"
+                          }
+                          aria-label={
+                            safeIsGameFavorited(game.id)
+                              ? `Remove ${game.name} from favorites`
+                              : `Add ${game.name} to favorites`
+                          }
+                        >
+                          <Heart
+                            size={16}
+                            fill={
+                              safeIsGameFavorited(game.id)
+                                ? "currentColor"
+                                : "none"
+                            }
+                          />
+                        </button>
                       </div>
                     </div>
-
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openRatingModal(game, e);
-                        }}
-                        className="p-1 rounded-full text-gray-400 hover:text-yellow-500 transition-colors"
-                        title="Rate this game"
-                      >
-                        <Star
-                          size={16}
-                          fill={
-                            getUserRating(game.id) > 0 ? "currentColor" : "none"
-                          }
-                          className={
-                            getUserRating(game.id) > 0 ? "text-yellow-500" : ""
-                          }
-                        />
-                      </button>
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleFavorite(game);
-                        }}
-                        className={`p-1 rounded-full transition-colors ${
-                          isGameFavorited(game.id)
-                            ? "text-red-500 hover:text-red-600"
-                            : "text-gray-400 hover:text-red-500"
-                        }`}
-                      >
-                        <Heart
-                          size={16}
-                          fill={
-                            isGameFavorited(game.id) ? "currentColor" : "none"
-                          }
-                        />
-                      </button>
-
-                      {getUserRating(game.id) > 0 && (
-                        <div className="flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">
-                          <Star size={12} fill="currentColor" />
-                          {getUserRating(game.id)}
-                        </div>
-                      )}
-
-                      {game.metacritic && (
-                        <div
-                          className={`text-xs px-2 py-1 rounded ${
-                            game.metacritic >= 80
-                              ? "bg-green-100 text-green-800"
-                              : game.metacritic >= 60
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {game.metacritic}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
+              </div>
+              <div className="mt-3 pt-3 border-t border-gray-200 text-xs text-gray-500 text-center">
+                Use ↑↓ arrows to navigate, Enter to select, Esc to close
               </div>
             </div>
           ) : (
-            <div className="p-8 text-center text-gray-600">
-              <Search size={48} className="mx-auto mb-4 text-gray-400" />
-              <h3 className="text-lg font-semibold mb-2">No games found</h3>
-              <p>Try adjusting your search terms or filters</p>
+            <div className="p-4 text-gray-800 text-center">
+              <Search size={32} className="mx-auto mb-2 text-gray-400" />
+              <p>No games found for "{searchTerm}"</p>
+              <p className="text-sm text-gray-500 mt-1">
+                Try different keywords or check filters
+              </p>
             </div>
           )}
         </div>

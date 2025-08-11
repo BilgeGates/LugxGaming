@@ -25,9 +25,11 @@ const FavoritesModal = ({
         onClose();
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
+    if (show) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [onClose]);
+  }, [onClose, show]);
 
   if (!show) return null;
 
@@ -54,7 +56,6 @@ const FavoritesModal = ({
             </button>
           </div>
         </div>
-
         <div className="p-6">
           {favorites.length === 0 ? (
             <div className="text-center py-12">
@@ -68,7 +69,7 @@ const FavoritesModal = ({
             </div>
           ) : (
             <div className="space-y-3 max-h-96 overflow-y-auto">
-              {getSortedFavorites().map((game) => (
+              {getSortedFavorites.map((game) => (
                 <div
                   key={game.id}
                   className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-200 ${
@@ -84,7 +85,6 @@ const FavoritesModal = ({
                       fill="currentColor"
                     />
                   )}
-
                   <img
                     src={
                       game.background_image ||
@@ -97,7 +97,6 @@ const FavoritesModal = ({
                         "https://via.placeholder.com/80x60?text=No+Image";
                     }}
                   />
-
                   <div
                     className="flex-1 cursor-pointer"
                     onClick={() => handleGameSelect(game)}
@@ -128,7 +127,6 @@ const FavoritesModal = ({
                       </span>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-2">
                     <button
                       onClick={(e) => openRatingModal(game, e)}
@@ -145,7 +143,6 @@ const FavoritesModal = ({
                         }
                       />
                     </button>
-
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -165,7 +162,6 @@ const FavoritesModal = ({
                         fill={isGamePinned(game.id) ? "currentColor" : "none"}
                       />
                     </button>
-
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -176,27 +172,6 @@ const FavoritesModal = ({
                     >
                       <Trash2 size={16} />
                     </button>
-
-                    {getUserRating(game.id) > 0 && (
-                      <div className="flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">
-                        <Star size={12} fill="currentColor" />
-                        {getUserRating(game.id)}
-                      </div>
-                    )}
-
-                    {game.metacritic && (
-                      <div
-                        className={`text-xs px-2 py-1 rounded-full ${
-                          game.metacritic >= 80
-                            ? "bg-green-100 text-green-800"
-                            : game.metacritic >= 60
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {game.metacritic}
-                      </div>
-                    )}
                   </div>
                 </div>
               ))}
