@@ -350,10 +350,7 @@ const SearchBar = ({
                   className="w-full px-3 py-2 pr-8 rounded-lg bg-gray-900 bg-opacity-90 text-gray-200 border border-gray-700
              focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-0
              appearance-none transition-all duration-200 ease-in-out hover:border-gray-600 focus:border-cyan-500
-             bg-no-repeat bg-[left_1rem_center] bg-[length:12px_12px]"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml;utf8,<svg fill='lightgray' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>")`,
-                  }}
+            "
                 >
                   <option className="bg-gray-900 text-gray-200" value="">
                     All Genres
@@ -383,10 +380,7 @@ const SearchBar = ({
                   className="w-full px-3 py-2 pr-8 rounded-lg bg-gray-900 bg-opacity-90 text-gray-200 border border-gray-700
              focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-0
              appearance-none transition-all duration-200 ease-in-out hover:border-gray-600 focus:border-cyan-500
-             bg-no-repeat bg-[left_1rem_center] bg-[length:12px_12px]"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml;utf8,<svg fill='lightgray' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>")`,
-                  }}
+           "
                 >
                   <option
                     className="bg-gray-900 text-gray-200"
