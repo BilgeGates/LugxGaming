@@ -124,7 +124,7 @@ const SearchBar = ({
         if (handleSearch) {
           await handleSearch(value, genre, sort);
         }
-        setVisibleCount(4);
+        setVisibleCount(7);
         setIsSearching(false);
       }, 300);
     },
