@@ -9,6 +9,8 @@ const useGameData = () => {
   const [sortBy, setSortBy] = useState("relevance");
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
+  const [error, setError] = useState("");
+
   const [genres] = useState([
     { id: "4", name: "Action" },
     { id: "3", name: "Adventure" },
@@ -27,14 +29,16 @@ const useGameData = () => {
   useEffect(() => {
     const fetchGames = async () => {
       setLoading(true);
+      setError("");
       try {
         const response = await fetch(
           `https://api.rawg.io/api/games?key=${API_KEY}&page_size=40`
         );
+        if (!response.ok) throw new Error("Failed to fetch");
         const data = await response.json();
         setAllGames(data.results || []);
       } catch (err) {
-        console.error("Error fetching games:", err);
+        setError(err.message || "Unknown error");
         setAllGames([]);
       } finally {
         setLoading(false);
