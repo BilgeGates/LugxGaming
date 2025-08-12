@@ -1,103 +1,166 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import useGameData from "../../../hooks/useGameData";
+import useFavorites from "../../../hooks/useFavorites";
+import useRating from "../../../hooks/useRating";
+import useRecentViews from "../../../hooks/useRecentViews";
 import GameCard from "../../common/GameCard";
+import RatingModal from "../../common/RatingModal";
+import { TrendingUp, Gamepad2, ArrowRight } from "lucide-react";
 
 const TrendingSection = () => {
   const { allGames, loading, error } = useGameData();
-  const [modalOpen, setModalOpen] = useState(false);
+  const { toggleFavorite, isGameFavorited } = useFavorites();
+  const { getUserRating, submitRating } = useRating();
+  const { addToRecentViews } = useRecentViews();
 
+  const [ratingModalOpen, setRatingModalOpen] = useState(false);
+  const [selectedGameForRating, setSelectedGameForRating] = useState(null);
+  const [animatedCards, setAnimatedCards] = useState([]);
+
+  const handleGameSelect = (game) => {
+    addToRecentViews(game);
+    window.open(`/products/${game.id}`, "_self");
+  };
+
+  const handleRatingClick = (game, e) => {
+    e.stopPropagation();
+    setSelectedGameForRating(game);
+    setRatingModalOpen(true);
+  };
+
+  const handleRatingSubmit = (rating) => {
+    if (selectedGameForRating) {
+      submitRating(selectedGameForRating.id, rating);
+      setRatingModalOpen(false);
+      setSelectedGameForRating(null);
+    }
+  };
+
+  const closeRatingModal = () => {
+    setRatingModalOpen(false);
+    setSelectedGameForRating(null);
+  };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const visibleGames = Array.isArray(allGames) ? allGames.slice(0, 4) : [];
 
+  useEffect(() => {
+    if (!loading && visibleGames.length > 0) {
+      visibleGames.forEach((_, index) => {
+        setTimeout(() => {
+          setAnimatedCards((prev) => [...prev, index]);
+        }, index * 150);
+      });
+    }
+  }, [loading, visibleGames.length]);
+
   return (
-    <section className="trending-section py-16 text-white min-h-[600px]">
-      <div className="container mx-auto max-w-7xl px-6">
-        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12 gap-4">
-          <div>
-            <h6 className="text-cyan-400 uppercase tracking-widest font-semibold mb-1 text-sm sm:text-base">
-              Trending
-            </h6>
-            <h2 className="text-4xl font-extrabold leading-tight">
-              Trending Games
-            </h2>
+    <section className="relative min-h-[700px] overflow-hidden">
+      <div className="relative z-10 container mx-auto max-w-7xl px-6 py-20">
+        <div className="text-center mb-16">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div
+              className="p-3 rounded-full"
+              style={{
+                background:
+                  "linear-gradient(45deg, rgb(34, 211, 238), rgb(168, 85, 247))",
+              }}
+            >
+              <TrendingUp size={24} className="text-white" />
+            </div>
+            <div className="text-cyan-400 uppercase tracking-widest font-bold text-sm">
+              Trending Now
+            </div>
           </div>
-          <button
-            onClick={() => setModalOpen(true)}
-            aria-label="View all trending games"
-            className="inline-block bg-cyan-500 hover:bg-purple-700 transition-colors text-white font-semibold px-6 py-3 rounded-lg shadow-lg shadow-cyan-600/30 focus:outline-none focus:ring-4 focus:ring-cyan-400"
-          >
-            View All
-          </button>
-        </header>
+
+          <h2 className="text-6xl lg:text-7xl font-black text-white mb-6 leading-tight">
+            Most{" "}
+            <span
+              className="bg-clip-text text-transparent"
+              style={{
+                background:
+                  "linear-gradient(45deg, rgb(34, 211, 238), rgb(168, 85, 247))",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              Popular
+            </span>{" "}
+            Games
+          </h2>
+
+          <p className="text-gray-300 text-xl max-w-2xl mx-auto mb-8 leading-relaxed">
+            Discover the hottest games everyone's playing right now. Join
+            millions of gamers worldwide!
+          </p>
+
+          <Link to="/products">
+            <button className="group relative inline-flex items-center gap-3 bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-4 rounded-2xl transition-all duration-300 transform hover:scale-105">
+              <Gamepad2 size={20} className="group-hover:animate-bounce" />
+              <span>Explore All Games</span>
+              <ArrowRight size={20} />
+            </button>
+          </Link>
+        </div>
 
         {loading && (
-          <p className="text-center text-lg text-gray-300 animate-pulse">
-            Loading games...
-          </p>
+          <div className="flex flex-col items-center gap-4 py-16">
+            <div className="relative">
+              <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-500 rounded-full animate-spin"></div>
+              <div
+                className="absolute inset-0 w-16 h-16 border-4 border-cyan-200 border-b-cyan-500 rounded-full animate-spin"
+                style={{
+                  animationDirection: "reverse",
+                  animationDuration: "0.8s",
+                }}
+              ></div>
+            </div>
+            <p className="text-xl text-gray-300 animate-pulse">
+              Loading games...
+            </p>
+          </div>
         )}
+
         {error && (
-          <p className="text-center text-red-500 font-semibold">{error}</p>
+          <div className="text-center py-16">
+            <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-8 max-w-md mx-auto">
+              <p className="text-red-400 font-semibold text-lg">{error}</p>
+            </div>
+          </div>
         )}
 
         {!loading && !error && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {visibleGames.map((game) => (
+            {visibleGames.map((game, index) => (
               <GameCard
                 key={game.id}
                 game={game}
-                variant="default"
-                onSelect={() => window.open(`/products/${game.id}`, "_self")}
-                userRating={game.rating}
-                showActions={false}
+                onSelect={handleGameSelect}
+                onRate={handleRatingClick}
+                onToggleFavorite={toggleFavorite}
+                isFavorited={isGameFavorited(game.id)}
+                getUserRating={getUserRating}
+                animated={animatedCards.includes(index)}
+                showActions={true}
               />
             ))}
           </div>
         )}
-
-        {modalOpen && (
-          <Modal title="All Trending Games" onClose={() => setModalOpen(false)}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-h-[70vh] overflow-y-auto p-2">
-              {allGames.map((game) => (
-                <GameCard
-                  key={game.id}
-                  game={game}
-                  variant="default"
-                  onSelect={() => window.open(`/products/${game.id}`, "_self")}
-                  userRating={game.rating}
-                  showActions={false}
-                />
-              ))}
-            </div>
-          </Modal>
-        )}
       </div>
+
+      <RatingModal
+        show={ratingModalOpen}
+        onClose={closeRatingModal}
+        game={selectedGameForRating}
+        onSubmitRating={handleRatingSubmit}
+        currentRating={
+          selectedGameForRating ? getUserRating(selectedGameForRating.id) : 0
+        }
+      />
     </section>
   );
 };
-
-const Modal = ({ children, onClose, title }) => (
-  <div
-    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm p-4"
-    aria-modal="true"
-    role="dialog"
-    aria-labelledby="modal-title"
-  >
-    <div className="bg-white rounded-3xl max-w-7xl w-full max-h-full overflow-auto p-8 shadow-2xl relative">
-      <h2
-        id="modal-title"
-        className="text-3xl font-bold text-gray-900 mb-6 select-none"
-      >
-        {title}
-      </h2>
-      <button
-        onClick={onClose}
-        aria-label="Close modal"
-        className="absolute top-5 right-5 text-gray-600 hover:text-gray-900 transition text-3xl font-bold focus:outline-none"
-      >
-        &times;
-      </button>
-      {children}
-    </div>
-  </div>
-);
 
 export default TrendingSection;

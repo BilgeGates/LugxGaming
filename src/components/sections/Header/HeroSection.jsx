@@ -156,7 +156,13 @@ const HeroSection = ({
                 ))}
               </div>
 
-              <div className="absolute -bottom-4 -right-4 bg-gradient-to-r from-cyan-500 to-purple-600 p-4 rounded-xl shadow-lg animate-bounce">
+              <div
+                className="absolute -bottom-4 -right-4 p-4 rounded-xl shadow-lg animate-bounce"
+                style={{
+                  background:
+                    "linear-gradient(45deg, rgb(34, 211, 238), rgb(168, 85, 247))",
+                }}
+              >
                 <Gamepad2 size={30} className="text-white" />
               </div>
 

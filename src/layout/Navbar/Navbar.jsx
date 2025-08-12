@@ -17,12 +17,24 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navLinkClass = ({ isActive }) =>
-    `block px-6 py-2 rounded-full font-light transition-colors duration-300 ${
-      isActive
-        ? "bg-gradient-to-r from-cyan-400 to-purple-600 text-white"
-        : "text-white hover:bg-white/20"
-    }`;
+  const navLinkClass = ({ isActive }) => {
+    if (isActive) {
+      return {
+        className:
+          "block px-6 py-2 rounded-full font-light transition-colors duration-300 text-white",
+        style: {
+          background:
+            "linear-gradient(45deg, rgb(34, 211, 238), rgb(168, 85, 247))",
+        },
+      };
+    } else {
+      return {
+        className:
+          "block px-6 py-2 rounded-full font-light transition-colors duration-300 text-white hover:bg-white/20",
+        style: {},
+      };
+    }
+  };
 
   return (
     <nav
@@ -44,21 +56,25 @@ const Navbar = () => {
         <div className="hidden lg:flex items-center space-x-12">
           <NavLink
             to="/"
-            className={navLinkClass}
+            {...navLinkClass({ isActive: window.location.pathname === "/" })}
             onClick={() => setMenuOpen(false)}
           >
             Home
           </NavLink>
           <NavLink
             to="/products"
-            className={navLinkClass}
+            {...navLinkClass({
+              isActive: window.location.pathname === "/products",
+            })}
             onClick={() => setMenuOpen(false)}
           >
             Products
           </NavLink>
           <NavLink
             to="/contact"
-            className={navLinkClass}
+            {...navLinkClass({
+              isActive: window.location.pathname === "/contact",
+            })}
             onClick={() => setMenuOpen(false)}
           >
             Contact Us

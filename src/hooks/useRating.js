@@ -12,7 +12,6 @@ const useRating = () => {
       },
     }));
   }, []);
-
   const getUserRating = useCallback(
     (gameId) => {
       return gameRatings[gameId]?.rating || 0;

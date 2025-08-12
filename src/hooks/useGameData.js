@@ -40,6 +40,7 @@ const useGameData = () => {
       } catch (err) {
         setError(err.message || "Unknown error");
         setAllGames([]);
+        console.log(error);
       } finally {
         setLoading(false);
       }
