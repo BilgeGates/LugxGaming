@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import SearchBar from "../../components/common/SearchBar";
 import { Gamepad2, Star, Users } from "lucide-react";
+
+import SearchBar from "../../../components/common/SearchBar";
 
 const heroImages = [
   "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&h=400&fit=crop&crop=center",
