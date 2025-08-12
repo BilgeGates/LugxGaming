@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Mail,
   Phone,
@@ -115,7 +115,6 @@ const Contact = () => {
               </div>
             </div>
 
-            {/* Contact Form */}
             <div className="lg:col-span-2">
               <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl p-8 lg:p-12 shadow-lg border border-gray-200/50 dark:border-gray-700/50">
                 <div className="flex items-center mb-8">
