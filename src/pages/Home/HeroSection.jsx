@@ -108,6 +108,7 @@ const HeroSection = ({
                 toggleFavorite={toggleFavorite}
                 isGameFavorited={isGameFavorited}
                 formatDate={formatDate}
+                openRatingModal={openRatingModal}
               />
 
               {!loading && (

@@ -45,7 +45,7 @@ const SearchBar = ({
   const searchRef = useRef(null);
   const searchTimeoutRef = useRef(null);
   const [selectedResultIndex, setSelectedResultIndex] = useState(-1);
-  const [isSearching, setIsSearching] = useState(false); // Yeni state
+  const [isSearching, setIsSearching] = useState(false);
 
   const [visibleCount, setVisibleCount] = useState(7);
   const [loadingMore, setLoadingMore] = useState(false);
