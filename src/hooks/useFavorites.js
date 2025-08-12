@@ -1,8 +1,38 @@
-import { useCallback, useState, useMemo } from "react";
+import { useCallback, useState, useMemo, useEffect } from "react";
+
+const FAVORITES_STORAGE_KEY = "favorites";
+const PINNED_STORAGE_KEY = "pinnedFavorites";
 
 const useFavorites = () => {
-  const [favorites, setFavorites] = useState([]);
-  const [pinnedFavorites, setPinnedFavorites] = useState([]);
+  const [favorites, setFavorites] = useState(() => {
+    try {
+      const stored = localStorage.getItem(FAVORITES_STORAGE_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [pinnedFavorites, setPinnedFavorites] = useState(() => {
+    try {
+      const stored = localStorage.getItem(PINNED_STORAGE_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
+    } catch {}
+  }, [favorites]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(PINNED_STORAGE_KEY, JSON.stringify(pinnedFavorites));
+    } catch {}
+  }, [pinnedFavorites]);
 
   const toggleFavorite = useCallback((game) => {
     const gameId = typeof game === "object" ? game.id : game;
@@ -44,16 +74,12 @@ const useFavorites = () => {
   }, []);
 
   const isGameFavorited = useCallback(
-    (gameId) => {
-      return favorites.some((fav) => fav.id === gameId);
-    },
+    (gameId) => favorites.some((fav) => fav.id === gameId),
     [favorites]
   );
 
   const isGamePinned = useCallback(
-    (gameId) => {
-      return pinnedFavorites.includes(gameId);
-    },
+    (gameId) => pinnedFavorites.includes(gameId),
     [pinnedFavorites]
   );
 
