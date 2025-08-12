@@ -76,7 +76,7 @@ const Header = () => {
 
   return (
     <div
-      className="min-h-screen relative overflow-hidden"
+      className="relative"
       style={{
         background:
           "linear-gradient(135deg, rgb(88, 28, 135), rgb(30, 58, 138), rgb(67, 56, 202))",

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import SearchBar from "../../components/common/SearchBar";
-import GameCard from "../../components/common/GameCard";
 import { Gamepad2, Star, Users } from "lucide-react";
 
 const heroImages = [
@@ -45,9 +44,6 @@ const HeroSection = ({
     return () => clearInterval(interval);
   }, []);
 
-  // Göstərmək üçün ilk 6 oyunu seçirik, lazım olsa dəyişə bilərsən
-  const displayedGames = allGames?.slice(0, 6) || [];
-
   return (
     <header className="relative z-10 pt-20">
       <div className="container mx-auto px-6 py-8">
@@ -91,7 +87,6 @@ const HeroSection = ({
                 </div>
               )}
 
-              {/* Burada SearchBar varsa onu göstər */}
               <SearchBar
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}

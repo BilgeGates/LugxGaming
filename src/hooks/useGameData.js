@@ -44,6 +44,7 @@ const useGameData = () => {
   }, []);
 
   const searchGames = async (term, genre = "", sort = "relevance") => {
+    console.log("searchGames called:", { term, genre, sort }); // ①
     if (term.trim() === "" && genre === "") {
       setSearchResults([]);
       setShowResults(false);
@@ -59,6 +60,9 @@ const useGameData = () => {
 
       const response = await fetch(url);
       const data = await response.json();
+
+      console.log("RAWG API response:", data); // ②
+
       setSearchResults(data.results || []);
       setShowResults(true);
     } catch (error) {
