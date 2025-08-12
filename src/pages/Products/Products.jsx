@@ -2,11 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../../layout/Navbar/Navbar";
 import Footer from "../../layout/Footer/Footer";
-import "./products.css";
 
 const API_KEY = "28dbf80fd39248b19263558419c182e3";
 const API_URL = `https://api.rawg.io/api/games?key=${API_KEY}&page_size=40`;
-
 const GAMES_PER_PAGE = 8;
 
 const Products = () => {
@@ -91,9 +89,9 @@ const Products = () => {
 
   const getRatingColor = (rating) => {
     const score = rating * 20;
-    if (score < 60) return "#ff4444";
-    if (score < 80) return "#ffaa00";
-    return "#44ff44";
+    if (score < 60) return "text-red-500";
+    if (score < 80) return "text-yellow-400";
+    return "text-green-500";
   };
 
   const formatRatingScore = (rating) => Math.round(rating * 20);
@@ -144,154 +142,167 @@ const Products = () => {
     <>
       <Navbar />
 
-      <div className="banner__image" id="BannerImage">
-        <header>
-          <div className="container info__container">
-            <h2>Products</h2>
-            <div className="breadcrumb">
-              <Link to="/">Home</Link> &gt; Products
-            </div>
-          </div>
-        </header>
+      <div className="py-12 mb-8">
+        <div className="container mx-auto max-w-7xl px-6 text-white">
+          <h2 className="text-4xl font-extrabold mb-2">Products</h2>
+          <nav className="text-cyan-300 text-sm">
+            <Link to="/" className="hover:underline">
+              Home
+            </Link>{" "}
+            &gt; <span className="font-semibold">Products</span>
+          </nav>
+        </div>
       </div>
 
-      <section className="products">
-        <div className="container products__container">
-          <div className="controls-wrapper">
-            <div className="controls-container">
+      <section className="container mx-auto max-w-7xl px-6 pb-12">
+        <div className="mb-6 flex flex-wrap gap-3">
+          <button
+            className={`px-4 py-2 rounded-full font-semibold transition ${
+              activeFilter === "all"
+                ? "bg-cyan-500 text-white shadow-lg shadow-cyan-500/50"
+                : "bg-gray-200 text-gray-700 hover:bg-cyan-300 hover:text-white"
+            }`}
+            onClick={() => handleFilterClick("all")}
+          >
+            All
+          </button>
+
+          {genres.map((genre, idx) => {
+            const genreFilter = sanitizeGenreName(genre);
+            return (
               <button
-                className={`btn genre__btn ${
-                  activeFilter === "all" ? "active" : ""
+                key={idx}
+                className={`px-4 py-2 rounded-full font-semibold transition ${
+                  activeFilter === genreFilter
+                    ? "bg-cyan-500 text-white shadow-lg shadow-cyan-500/50"
+                    : "bg-gray-200 text-gray-700 hover:bg-cyan-300 hover:text-white"
                 }`}
-                onClick={() => handleFilterClick("all")}
+                onClick={() => handleFilterClick(genreFilter)}
               >
-                All
+                {capitalize(genre)}
               </button>
-
-              {genres.map((genre, index) => {
-                const genreFilter = sanitizeGenreName(genre);
-                return (
-                  <button
-                    key={index}
-                    className={`btn genre__btn ${
-                      activeFilter === genreFilter ? "active" : ""
-                    }`}
-                    onClick={() => handleFilterClick(genreFilter)}
-                  >
-                    {capitalize(genre)}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {loading && <p>Loading games...</p>}
-          {error && <p className="error">{error}</p>}
-
-          <div className="cards" id="productsItems">
-            {displayedGames.map((game) => {
-              const primaryGenre = game.genres?.[0]?.name || "Unknown";
-              const releaseDate = formatReleaseDate(game.released);
-              const ratingScore = formatRatingScore(game.rating);
-              const ratingColor = getRatingColor(game.rating);
-
-              return (
-                <div
-                  key={game.id}
-                  className="card"
-                  style={{ position: "relative" }}
-                >
-                  <div className="card__image">
-                    <Link to={`/products/${game.id}`}>
-                      <img
-                        src={game.background_image || "/placeholder-game.jpg"}
-                        alt={game.name}
-                        loading="lazy"
-                        onError={(e) => {
-                          e.target.src = "/placeholder-game.jpg";
-                        }}
-                      />
-                    </Link>
-                  </div>
-
-                  <div className="card__content">
-                    <p>
-                      <span className="category">Category:</span> {primaryGenre}
-                    </p>
-                    <h4>
-                      <span className="title">Name:</span> {game.name}
-                    </h4>
-                    <div>
-                      <span className="date">Release Date:</span> {releaseDate}
-                    </div>
-
-                    <span
-                      className="rating-score"
-                      style={{
-                        position: "absolute",
-                        top: "1rem",
-                        right: "1rem",
-                        color: ratingColor,
-                        fontWeight: "bold",
-                        border: `1px solid ${ratingColor}`,
-                        padding: "4px 8px",
-                        borderRadius: "4px",
-                        fontSize: "14px",
-                        backgroundColor: "rgba(255, 255, 255, 0.1)",
-                        minWidth: "35px",
-                        textAlign: "center",
-                      }}
-                    >
-                      {ratingScore}
-                    </span>
-
-                    <Link to={`/products/${game.id}`}>
-                      <button className="btn card__btn">Explore</button>
-                    </Link>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {totalPages > 1 && (
-            <div className="pagination">
-              <button
-                className="pagination__btn"
-                onClick={goToPreviousPage}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </button>
-
-              {getPageNumbers().map((page) => (
-                <button
-                  key={page}
-                  className={`pagination__btn ${
-                    currentPage === page ? "active" : ""
-                  }`}
-                  onClick={() => goToPage(page)}
-                >
-                  {page}
-                </button>
-              ))}
-
-              <button
-                className="pagination__btn"
-                onClick={goToNextPage}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </button>
-
-              <div className="pagination__info">
-                Showing {(currentPage - 1) * GAMES_PER_PAGE + 1}-
-                {Math.min(currentPage * GAMES_PER_PAGE, filteredGames.length)}{" "}
-                of {filteredGames.length} games
-              </div>
-            </div>
-          )}
+            );
+          })}
         </div>
+
+        {loading && (
+          <p className="text-center text-lg text-gray-500 animate-pulse">
+            Loading games...
+          </p>
+        )}
+        {error && (
+          <p className="text-center text-red-500 font-semibold">{error}</p>
+        )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {displayedGames.map((game) => {
+            const primaryGenre = game.genres?.[0]?.name || "Unknown";
+            const releaseDate = formatReleaseDate(game.released);
+            const ratingScore = formatRatingScore(game.rating);
+
+            return (
+              <div
+                key={game.id}
+                className="bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition cursor-pointer relative group"
+              >
+                <Link to={`/products/${game.id}`} className="block">
+                  <img
+                    src={game.background_image || "/placeholder-game.jpg"}
+                    alt={game.name}
+                    loading="lazy"
+                    onError={(e) => {
+                      e.target.src = "/placeholder-game.jpg";
+                    }}
+                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </Link>
+
+                <span
+                  className={`absolute top-3 right-3 px-3 py-1 text-sm font-bold rounded-full border shadow-md ${
+                    ratingScore < 60
+                      ? "bg-red-600 text-white border-red-700"
+                      : ratingScore < 80
+                      ? "bg-yellow-400 text-gray-900 border-yellow-500"
+                      : "bg-green-600 text-white border-green-700"
+                  }`}
+                  title={`Rating: ${ratingScore}%`}
+                >
+                  {ratingScore}
+                </span>
+
+                <div className="p-4">
+                  <p className="text-sm text-cyan-400 mb-1">
+                    Category: <span className="text-white">{primaryGenre}</span>
+                  </p>
+                  <h4 className="text-xl font-semibold mb-2">{game.name}</h4>
+                  <p className="text-gray-300 mb-4">
+                    Release Date: {releaseDate}
+                  </p>
+                  <Link to={`/products/${game.id}`}>
+                    <button className="w-full bg-cyan-500 hover:bg-purple-700 text-white font-semibold py-2 rounded-lg transition">
+                      Explore
+                    </button>
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {totalPages > 1 && (
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-2">
+            <button
+              onClick={goToPreviousPage}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 rounded-lg font-semibold transition ${
+                currentPage === 1
+                  ? "bg-gray-400 cursor-not-allowed text-gray-700"
+                  : "bg-cyan-500 hover:bg-purple-700 text-white"
+              }`}
+            >
+              Previous
+            </button>
+
+            {getPageNumbers().map((page) => (
+              <button
+                key={page}
+                onClick={() => goToPage(page)}
+                className={`px-4 py-2 rounded-lg font-semibold transition ${
+                  currentPage === page
+                    ? "bg-purple-700 text-white shadow-lg"
+                    : "bg-gray-200 text-gray-800 hover:bg-cyan-300 hover:text-white"
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+
+            <button
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages}
+              className={`px-4 py-2 rounded-lg font-semibold transition ${
+                currentPage === totalPages
+                  ? "bg-gray-400 cursor-not-allowed text-gray-700"
+                  : "bg-cyan-500 hover:bg-purple-700 text-white"
+              }`}
+            >
+              Next
+            </button>
+
+            <div className="w-full text-center text-gray-400 mt-4 select-none">
+              Showing{" "}
+              <span className="font-semibold">
+                {(currentPage - 1) * GAMES_PER_PAGE + 1}
+              </span>
+              -
+              <span className="font-semibold">
+                {Math.min(currentPage * GAMES_PER_PAGE, filteredGames.length)}
+              </span>{" "}
+              of <span className="font-semibold">{filteredGames.length}</span>{" "}
+              games
+            </div>
+          </div>
+        )}
       </section>
 
       <Footer />
