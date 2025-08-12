@@ -13,4 +13,26 @@
   text-decoration: none;
   border: none;
   outline: none;
+  scrollbar-width: thin;
+  scrollbar-color: #6b21a8 transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #6b21a8;
+  border-radius: 9999px;
+  transition: background-color 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #7c3aed;
 }
