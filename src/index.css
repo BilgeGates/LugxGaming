@@ -17,6 +17,15 @@
   scrollbar-color: #6b21a8 transparent;
 }
 
+body {
+  background: linear-gradient(
+    135deg,
+    rgb(88, 28, 135),
+    rgb(30, 58, 138),
+    rgb(67, 56, 202)
+  );
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;

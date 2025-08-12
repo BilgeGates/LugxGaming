@@ -75,13 +75,7 @@ const Header = () => {
   ];
 
   return (
-    <div
-      className="relative"
-      style={{
-        background:
-          "linear-gradient(135deg, rgb(88, 28, 135), rgb(30, 58, 138), rgb(67, 56, 202))",
-      }}
-    >
+    <div className="relative">
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-10 left-10 w-20 h-20 bg-pink-500 rounded-full animate-pulse"></div>
         <div className="absolute top-32 right-20 w-16 h-16 bg-cyan-500 rounded-full animate-bounce"></div>

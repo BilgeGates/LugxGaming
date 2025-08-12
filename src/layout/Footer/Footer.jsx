@@ -10,10 +10,9 @@ import {
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-tr from-purple-900 via-blue-900 to-indigo-900 text-white py-12">
+    <footer className="text-white py-12">
       <div className="container mx-auto px-6 max-w-7xl">
         <div className="flex flex-col md:flex-row justify-between gap-12 md:gap-0">
-          {/* Company Info */}
           <div className="max-w-sm space-y-4">
             <h3 className="text-2xl font-extrabold">LUGX Gaming</h3>
             <p className="text-gray-300">
@@ -21,7 +20,6 @@ const Footer = () => {
               Trusted by thousands of gamers worldwide.
             </p>
 
-            {/* Contact Info */}
             <div className="space-y-2 text-gray-400 text-sm">
               <div className="flex items-center gap-3">
                 <FaEnvelope />
@@ -38,7 +36,6 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Social Icons */}
             <div className="flex space-x-6 mt-6">
               <a
                 href="https://www.facebook.com/profile.php?id=100091496015332"
@@ -79,7 +76,6 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Quick Links */}
           <div className="flex flex-col space-y-4">
             <h4 className="text-xl font-semibold text-cyan-400">Quick Links</h4>
             <a href="/about" className="hover:text-cyan-400 transition">
@@ -91,7 +87,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom Copyright */}
         <div className="mt-12 border-t border-white/20 pt-6 text-center text-gray-400 text-sm select-none">
           © 2025 LUGX Gaming Company. All rights reserved.
         </div>
