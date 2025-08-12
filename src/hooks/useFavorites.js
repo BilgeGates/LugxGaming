@@ -1,55 +1,32 @@
-import { useCallback, useState, useMemo, useEffect } from "react";
-
-const FAVORITES_STORAGE_KEY = "favorites";
-const PINNED_STORAGE_KEY = "pinnedFavorites";
+import { useCallback, useMemo } from "react";
+import useLocalStorage from "./useLocalStorage";
 
 const useFavorites = () => {
-  const [favorites, setFavorites] = useState(() => {
-    try {
-      const stored = localStorage.getItem(FAVORITES_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [favorites, setFavorites] = useLocalStorage("favorites", []);
+  const [pinnedFavorites, setPinnedFavorites] = useLocalStorage(
+    "pinnedFavorites",
+    []
+  );
 
-  const [pinnedFavorites, setPinnedFavorites] = useState(() => {
-    try {
-      const stored = localStorage.getItem(PINNED_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
+  const toggleFavorite = useCallback(
+    (game) => {
+      const gameId = typeof game === "object" ? game.id : game;
+      const gameData = typeof game === "object" ? game : null;
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
-    } catch {}
-  }, [favorites]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(PINNED_STORAGE_KEY, JSON.stringify(pinnedFavorites));
-    } catch {}
-  }, [pinnedFavorites]);
-
-  const toggleFavorite = useCallback((game) => {
-    const gameId = typeof game === "object" ? game.id : game;
-    const gameData = typeof game === "object" ? game : null;
-
-    setFavorites((prev) => {
-      const exists = prev.find((fav) => fav.id === gameId);
-      if (exists) {
-        setPinnedFavorites((prevPinned) =>
-          prevPinned.filter((pin) => pin !== gameId)
-        );
-        return prev.filter((fav) => fav.id !== gameId);
-      } else {
-        return gameData ? [...prev, gameData] : prev;
-      }
-    });
-  }, []);
+      setFavorites((prev) => {
+        const exists = prev.find((fav) => fav.id === gameId);
+        if (exists) {
+          setPinnedFavorites((prevPinned) =>
+            prevPinned.filter((pin) => pin !== gameId)
+          );
+          return prev.filter((fav) => fav.id !== gameId);
+        } else {
+          return gameData ? [...prev, gameData] : prev;
+        }
+      });
+    },
+    [setFavorites, setPinnedFavorites]
+  );
 
   const togglePin = useCallback(
     (gameId) => {
@@ -65,13 +42,16 @@ const useFavorites = () => {
         }
       });
     },
-    [favorites]
+    [favorites, setPinnedFavorites]
   );
 
-  const removeFavorite = useCallback((gameId) => {
-    setFavorites((prev) => prev.filter((fav) => fav.id !== gameId));
-    setPinnedFavorites((prev) => prev.filter((pin) => pin !== gameId));
-  }, []);
+  const removeFavorite = useCallback(
+    (gameId) => {
+      setFavorites((prev) => prev.filter((fav) => fav.id !== gameId));
+      setPinnedFavorites((prev) => prev.filter((pin) => pin !== gameId));
+    },
+    [setFavorites, setPinnedFavorites]
+  );
 
   const isGameFavorited = useCallback(
     (gameId) => favorites.some((fav) => fav.id === gameId),
