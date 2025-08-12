@@ -1,7 +1,22 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+
+const STORAGE_KEY = "recent_views";
 
 const useRecentViews = () => {
-  const [recentViews, setRecentViews] = useState([]);
+  const [recentViews, setRecentViews] = useState(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(recentViews));
+    } catch {}
+  }, [recentViews]);
 
   const addToRecentViews = useCallback((gameData) => {
     const processedGame = {
@@ -23,6 +38,9 @@ const useRecentViews = () => {
 
   const clearRecentViews = useCallback(() => {
     setRecentViews([]);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {}
   }, []);
 
   return {
