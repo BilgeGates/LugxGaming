@@ -51,6 +51,7 @@ const FavoritesModal = ({
             <button
               onClick={onClose}
               className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors"
+              aria-label="Close favorites modal"
             >
               <X size={20} />
             </button>
@@ -100,6 +101,11 @@ const FavoritesModal = ({
                   <div
                     className="flex-1 cursor-pointer"
                     onClick={() => handleGameSelect(game)}
+                    tabIndex={0}
+                    role="button"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleGameSelect(game);
+                    }}
                   >
                     <h4 className="font-semibold text-gray-800 hover:text-purple-600 transition-colors">
                       {game.name}
@@ -132,6 +138,7 @@ const FavoritesModal = ({
                       onClick={(e) => openRatingModal(game, e)}
                       className="p-2 rounded-full text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 transition-colors"
                       title="Rate this game"
+                      aria-label={`Rate ${game.name}`}
                     >
                       <Star
                         size={16}
@@ -156,6 +163,7 @@ const FavoritesModal = ({
                       title={
                         isGamePinned(game.id) ? "Unpin from top" : "Pin to top"
                       }
+                      aria-pressed={isGamePinned(game.id)}
                     >
                       <Pin
                         size={16}
@@ -165,10 +173,11 @@ const FavoritesModal = ({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        removeFavorite(game.id);
+                        toggleFavorite(game.id);
                       }}
                       className="p-2 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
                       title="Remove from favorites"
+                      aria-label={`Remove ${game.name} from favorites`}
                     >
                       <Trash2 size={16} />
                     </button>

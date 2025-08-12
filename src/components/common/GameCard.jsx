@@ -64,7 +64,6 @@ const GameCard = ({
         }}
       />
 
-      {/* Oyunun adı, janrı, rating və tarix */}
       <div className="flex-1 cursor-pointer">
         <h4
           className={`font-semibold transition-colors ${
@@ -178,7 +177,6 @@ const GameCard = ({
               {userRating.toFixed(1)}
             </div>
           )}
-          ğ{" "}
           {game.metacritic !== undefined && game.metacritic !== null && (
             <div
               className={`text-xs px-2 py-1 rounded-full select-none ${

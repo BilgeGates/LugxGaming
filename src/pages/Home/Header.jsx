@@ -93,29 +93,32 @@ const Header = () => {
       </div>
 
       <RatingModal
-        isOpen={showRatingModal}
+        show={showRatingModal}
         onClose={() => setShowRatingModal(false)}
-        gameData={ratingGameData}
+        game={ratingGameData}
         onSubmitRating={submitRating}
+        currentRating={rating.getUserRating(ratingGameData?.id)}
       />
 
       <FavoritesModal
-        isOpen={showFavoritesModal}
+        show={showFavoritesModal}
         onClose={() => setShowFavoritesModal(false)}
         favorites={favorites.favorites}
         toggleFavorite={favorites.toggleFavorite}
         pinnedFavorites={favorites.pinnedFavorites}
         togglePin={favorites.togglePin}
+        isGamePinned={favorites.isGamePinned}
         removeFavorite={favorites.removeFavorite}
         handleGameSelect={handleGameSelect}
         openRatingModal={openRatingModal}
         getUserRating={rating.getUserRating}
         getRatingColor={rating.getRatingColor}
         formatDate={gameData.formatDate}
+        getSortedFavorites={favorites.getSortedFavorites}
       />
 
       <RecentViewsModal
-        isOpen={showRecentModal}
+        show={showRecentModal}
         onClose={() => setShowRecentModal(false)}
         recentViews={recentViews.recentViews}
         clearRecentViews={recentViews.clearRecentViews}

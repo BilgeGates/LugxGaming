@@ -34,4 +34,5 @@ const useRating = () => {
     getRatingColor,
   };
 };
+
 export default useRating;

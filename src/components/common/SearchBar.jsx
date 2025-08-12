@@ -9,6 +9,14 @@ import {
   Calendar,
 } from "lucide-react";
 
+const popularGenres = [
+  { id: "action", name: "Action" },
+  { id: "rpg", name: "RPG" },
+  { id: "strategy", name: "Strategy" },
+  { id: "adventure", name: "Adventure" },
+  { id: "shooter", name: "Shooter" },
+];
+
 const SearchBar = ({
   searchTerm,
   setSearchTerm,
@@ -38,12 +46,11 @@ const SearchBar = ({
 
   useEffect(() => {
     return () => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-      }
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
     };
   }, []);
 
+  // Click outside and keyboard navigation
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
@@ -56,7 +63,6 @@ const SearchBar = ({
     const handleKeyDown = (event) => {
       if (!showResults || searchResults.length === 0) return;
 
-      // eslint-disable-next-line default-case
       switch (event.key) {
         case "Escape":
           setShowResults(false);
@@ -99,21 +105,18 @@ const SearchBar = ({
     handleGameSelect,
   ]);
 
+  // Debounced search
   const debouncedSearch = useCallback(
     (value, genre, sort) => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-      }
-
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
       searchTimeoutRef.current = setTimeout(() => {
-        if (handleSearch) {
-          handleSearch(value, genre, sort);
-        }
+        if (handleSearch) handleSearch(value, genre, sort);
       }, 300);
     },
     [handleSearch]
   );
 
+  // Input change handler
   const handleInputChange = useCallback(
     (e) => {
       const value = e.target.value;
@@ -130,21 +133,18 @@ const SearchBar = ({
     [setSearchTerm, selectedGenre, sortBy, debouncedSearch, setShowResults]
   );
 
+  // Clear search
   const handleClearSearch = useCallback(() => {
-    if (clearSearch) {
-      clearSearch();
-    }
+    if (clearSearch) clearSearch();
     setShowResults(false);
     setSelectedResultIndex(-1);
   }, [clearSearch, setShowResults]);
 
+  // Filter change (genre or sort)
   const handleFilterChange = useCallback(
     (filterType, value) => {
-      if (filterType === "genre") {
-        setSelectedGenre(value);
-      } else if (filterType === "sort") {
-        setSortBy(value);
-      }
+      if (filterType === "genre") setSelectedGenre(value);
+      else if (filterType === "sort") setSortBy(value);
 
       if (searchTerm.trim()) {
         debouncedSearch(
@@ -164,6 +164,7 @@ const SearchBar = ({
     ]
   );
 
+  // Result click handler
   const handleResultClick = useCallback(
     (game) => {
       handleGameSelect(game);
@@ -176,8 +177,7 @@ const SearchBar = ({
   const safeGetRatingColor = (rating) => {
     try {
       return getRatingColor ? getRatingColor(rating) : "text-gray-500";
-    } catch (error) {
-      console.warn("Error getting rating color:", error);
+    } catch {
       return "text-gray-500";
     }
   };
@@ -185,8 +185,7 @@ const SearchBar = ({
   const safeGetUserRating = (gameId) => {
     try {
       return getUserRating ? getUserRating(gameId) : 0;
-    } catch (error) {
-      console.warn("Error getting user rating:", error);
+    } catch {
       return 0;
     }
   };
@@ -194,15 +193,23 @@ const SearchBar = ({
   const safeIsGameFavorited = (gameId) => {
     try {
       return isGameFavorited ? isGameFavorited(gameId) : false;
-    } catch (error) {
-      console.warn("Error checking if game is favorited:", error);
+    } catch {
       return false;
     }
   };
 
+  // When popular genre clicked: set genre and do search immediately
+  const handlePopularGenreClick = (genre) => {
+    setSelectedGenre(genre.id);
+    setSearchTerm("");
+    setShowResults(false);
+    if (handleSearch) handleSearch("", genre.id, sortBy);
+  };
+
   return (
-    <div className="relative max-w-4xl" ref={searchRef}>
-      <div className="flex flex-col gap-4">
+    <div className="relative max-w-4xl mx-auto" ref={searchRef}>
+      <div className="flex flex-col gap-3">
+        {/* Search Input + Clear + Filters Button */}
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
             <Search
@@ -233,6 +240,7 @@ const SearchBar = ({
               </button>
             )}
           </div>
+
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`px-4 py-4 rounded-xl transition-colors ${
@@ -247,6 +255,26 @@ const SearchBar = ({
           </button>
         </div>
 
+        {/* Popular genres buttons */}
+        <div className="flex flex-wrap gap-2 px-1">
+          {popularGenres.map((genre) => (
+            <button
+              key={genre.id}
+              onClick={() => handlePopularGenreClick(genre)}
+              className={`px-3 py-1 rounded-full text-sm font-semibold transition-colors ${
+                selectedGenre === genre.id
+                  ? "bg-purple-700 text-white"
+                  : "bg-purple-100 text-purple-800 hover:bg-purple-200"
+              }`}
+              aria-pressed={selectedGenre === genre.id}
+              aria-label={`Search popular genre ${genre.name}`}
+            >
+              {genre.name}
+            </button>
+          ))}
+        </div>
+
+        {/* Filters panel */}
         {showFilters && (
           <div
             className="p-4 rounded-xl border"
@@ -304,6 +332,7 @@ const SearchBar = ({
         )}
       </div>
 
+      {/* Search results dropdown */}
       {showResults && searchTerm.trim() && (
         <div
           className="absolute top-full left-0 right-0 mt-2 rounded-xl shadow-2xl overflow-y-auto z-50 max-h-96 border"
@@ -324,6 +353,8 @@ const SearchBar = ({
               <div className="space-y-1">
                 {searchResults.map((game, index) => {
                   if (!game || !game.id) return null;
+
+                  const userRating = safeGetUserRating(game.id);
 
                   return (
                     <div
@@ -380,19 +411,39 @@ const SearchBar = ({
                           )}
                         </div>
                       </div>
+
+                      {/* Favorit və reytinq düymələri */}
                       <div className="flex items-center gap-2">
-                        {safeGetUserRating(game.id) > 0 && (
-                          <div className="flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">
+                        {/* İstifadəçinin verdiyi reytinq varsa göstər */}
+                        {userRating > 0 && (
+                          <div className="flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs select-none">
                             <Star size={12} fill="currentColor" />
-                            {safeGetUserRating(game.id).toFixed(1)}
+                            {userRating.toFixed(1)}
                           </div>
                         )}
+
                         <button
                           onClick={(e) => {
+                            e.preventDefault();
                             e.stopPropagation();
-                            if (toggleFavorite) {
-                              toggleFavorite(game);
-                            }
+                            if (openRatingModal) openRatingModal(game, e);
+                          }}
+                          title="Rate this game"
+                          className="p-2 rounded-full text-yellow-500 hover:text-yellow-600 transition-colors"
+                          aria-label={`Rate ${game.name} game`}
+                        >
+                          <Star
+                            size={16}
+                            fill={userRating > 0 ? "currentColor" : "none"}
+                            stroke="currentColor"
+                          />
+                        </button>
+
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (toggleFavorite) toggleFavorite(game);
                           }}
                           className={`p-2 rounded-full transition-colors ${
                             safeIsGameFavorited(game.id)

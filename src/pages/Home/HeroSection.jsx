@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import SearchBar from "../../components/common/SearchBar";
+import GameCard from "../../components/common/GameCard";
 import { Gamepad2, Star, Users } from "lucide-react";
 
 const heroImages = [
@@ -44,6 +45,9 @@ const HeroSection = ({
     return () => clearInterval(interval);
   }, []);
 
+  // Göstərmək üçün ilk 6 oyunu seçirik, lazım olsa dəyişə bilərsən
+  const displayedGames = allGames?.slice(0, 6) || [];
+
   return (
     <header className="relative z-10 pt-20">
       <div className="container mx-auto px-6 py-8">
@@ -87,6 +91,7 @@ const HeroSection = ({
                 </div>
               )}
 
+              {/* Burada SearchBar varsa onu göstər */}
               <SearchBar
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
@@ -132,11 +137,11 @@ const HeroSection = ({
           </div>
 
           <div className="lg:w-1/2 flex justify-center lg:justify-end mt-12 lg:mt-0">
-            <div className="relative">
+            <div className="relative w-full max-w-lg">
               <img
                 src={heroImages[currentImageIndex]}
                 alt="Gaming Hero"
-                className="relative w-full max-w-lg h-auto rounded-2xl shadow-2xl transform hover:scale-105 transition-all duration-500"
+                className="relative w-full h-auto rounded-2xl shadow-2xl transform hover:scale-105 transition-all duration-500"
               />
 
               <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
