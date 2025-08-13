@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   Star,
   Heart,
@@ -88,7 +89,7 @@ const GameCard = ({
         animated ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
       } ${className}`}
     >
-      <div className="group relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-2xl p-1 border border-white/10 hover:border-purple-400/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25">
+      <div className="group relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-2xl p-1 border border-white/10 transition-all duration-300 hover:scale-105">
         <div className="relative z-10 p-5">
           <div className="relative aspect-video mb-4 rounded-xl overflow-hidden group/image">
             <img
@@ -180,7 +181,6 @@ const GameCard = ({
           </div>
 
           <div className="space-y-3">
-            {/* Game Title */}
             <h3 className="font-bold text-white text-lg leading-tight group-hover:text-cyan-400 transition-colors line-clamp-2">
               {game.name}
             </h3>
@@ -237,17 +237,16 @@ const GameCard = ({
             </div>
           </div>
 
-          <button
-            onClick={() => handleGameSelect()}
-            className="w-full mt-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 group/btn"
-          >
-            <Trophy size={16} className="group-hover/btn:animate-bounce" />
-            Play Now
-            <ArrowRight
-              size={16}
-              className="group-hover/btn:translate-x-1 transition-transform"
-            />
-          </button>
+          <Link to="/products/:id">
+            <button
+              onClick={() => handleGameSelect()}
+              className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 group/btn"
+            >
+              <Trophy size={16} className="group-hover/btn:animate-bounce" />
+              Explore Now
+              <ArrowRight size={16} />
+            </button>
+          </Link>
         </div>
 
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>

@@ -53,7 +53,7 @@ const TrendingSection = () => {
         }, index * 150);
       });
     }
-  }, [loading, visibleGames.length]);
+  }, [loading, visibleGames, visibleGames.length]);
 
   return (
     <section className="relative min-h-[700px] overflow-hidden">
