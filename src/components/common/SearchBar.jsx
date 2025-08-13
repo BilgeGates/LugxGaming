@@ -43,10 +43,9 @@ const SearchBar = ({
   toggleFavorite,
   isGameFavorited,
   formatDate,
-  // Yeni proplar məsləhət üçün
-  popularGames = [], // API-dən gələn məşhur oyunlar
-  recentSearches = [], // Son axtarışlar
-  onAddRecentSearch, // Son axtarışa əlavə etmək üçün
+  popularGames = [],
+  recentSearches = [],
+  onAddRecentSearch,
 }) => {
   const searchRef = useRef(null);
   const searchTimeoutRef = useRef(null);
@@ -102,9 +101,10 @@ const SearchBar = ({
         case "Enter":
           event.preventDefault();
           if (selectedResultIndex >= 0 && currentResults[selectedResultIndex]) {
-            handleGameSelect(currentResults[selectedResultIndex]);
+            const selectedGame = currentResults[selectedResultIndex];
+            handleGameSelect(selectedGame);
             if (onAddRecentSearch) {
-              onAddRecentSearch(currentResults[selectedResultIndex]);
+              onAddRecentSearch(selectedGame);
             }
             setShowResults(false);
             setShowSuggestions(false);
@@ -124,8 +124,6 @@ const SearchBar = ({
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [
-    setShowResults,
-    setShowFilters,
     showResults,
     showSuggestions,
     searchResults,
@@ -136,6 +134,8 @@ const SearchBar = ({
     recentSearches,
     popularGames,
     onAddRecentSearch,
+    setShowResults,
+    setShowFilters,
   ]);
 
   const debouncedSearch = useCallback(
@@ -145,6 +145,7 @@ const SearchBar = ({
       if (value.trim() || genre) {
         setIsSearching(true);
         setShowSuggestions(false);
+        setShowResults(true);
       }
 
       searchTimeoutRef.current = setTimeout(async () => {
@@ -155,7 +156,7 @@ const SearchBar = ({
         setIsSearching(false);
       }, 300);
     },
-    [handleSearch]
+    [handleSearch, setShowResults]
   );
 
   const handleInputChange = useCallback(
@@ -174,15 +175,18 @@ const SearchBar = ({
         setIsSearching(false);
       }
     },
-    [setSearchTerm, selectedGenre, sortBy, debouncedSearch, setShowResults]
+    [setSearchTerm, setShowResults, debouncedSearch, selectedGenre, sortBy]
   );
 
   const handleInputFocus = useCallback(() => {
     if (!searchTerm.trim()) {
       setShowSuggestions(true);
       setShowResults(false);
+    } else {
+      setShowResults(true);
+      setShowSuggestions(false);
     }
-  }, [searchTerm]);
+  }, [searchTerm, setShowResults]);
 
   const handleClearSearch = useCallback(() => {
     if (clearSearch) clearSearch();
@@ -191,7 +195,7 @@ const SearchBar = ({
     setSelectedResultIndex(-1);
     setVisibleCount(7);
     setIsSearching(false);
-  }, [clearSearch]);
+  }, [clearSearch, setShowResults]);
 
   const handleFilterChange = useCallback(
     (filterType, value) => {
@@ -201,23 +205,18 @@ const SearchBar = ({
       const newGenre = filterType === "genre" ? value : selectedGenre;
       const newSort = filterType === "sort" ? value : sortBy;
 
-      if (searchTerm.trim() || newGenre || newSort !== "relevance") {
-        debouncedSearch(searchTerm, newGenre, newSort);
-        setShowResults(true);
-        setShowSuggestions(false);
-      } else {
-        setShowResults(false);
-        setShowSuggestions(true);
-        setIsSearching(false);
-      }
+      setShowResults(true);
+      setShowSuggestions(false);
+      debouncedSearch(searchTerm, newGenre, newSort);
     },
     [
-      searchTerm,
-      selectedGenre,
-      sortBy,
       setSelectedGenre,
       setSortBy,
+      selectedGenre,
+      sortBy,
+      searchTerm,
       debouncedSearch,
+      setShowResults,
     ]
   );
 
@@ -232,7 +231,7 @@ const SearchBar = ({
       setSelectedResultIndex(-1);
       setVisibleCount(7);
     },
-    [handleGameSelect, onAddRecentSearch]
+    [handleGameSelect, onAddRecentSearch, setShowResults]
   );
 
   const handleFavoriteToggle = useCallback(
@@ -271,14 +270,19 @@ const SearchBar = ({
     }
   };
 
-  const handlePopularGenreClick = (genre) => {
-    setSelectedGenre(genre.id);
-    setSearchTerm("");
-    setShowResults(false);
-    setShowSuggestions(false);
-    if (handleSearch) handleSearch("", genre.id, sortBy);
-    setVisibleCount(7);
-  };
+  const handlePopularGenreClick = useCallback(
+    (genre) => {
+      setSelectedGenre(genre.id);
+      setSearchTerm("");
+      setShowResults(true);
+      setShowSuggestions(false);
+      if (handleSearch) {
+        handleSearch("", genre.id, sortBy);
+      }
+      setVisibleCount(7);
+    },
+    [setSelectedGenre, setSearchTerm, setShowResults, handleSearch, sortBy]
+  );
 
   const onResultsScroll = (e) => {
     const target = e.target;
@@ -350,12 +354,12 @@ const SearchBar = ({
             {game.name || "Unknown Game"}
             {isRecent && (
               <span className="ml-2 text-xs text-blue-500 font-normal">
-                (Son axtarış)
+                (Last searched)
               </span>
             )}
             {isPopular && (
               <span className="ml-2 text-xs text-orange-500 font-normal">
-                (Məşhur)
+                (Popular)
               </span>
             )}
           </h4>
@@ -401,9 +405,9 @@ const SearchBar = ({
               e.stopPropagation();
               if (openRatingModal) openRatingModal(game, e);
             }}
-            title="Rate this game"
+            title="This game has a user rating"
             className="p-2 rounded-full text-yellow-500 hover:text-yellow-600 transition-all duration-200 ease-in-out hover:bg-yellow-50 hover:scale-110"
-            aria-label={`Rate ${game.name} game`}
+            aria-label={`${game.name} Rated the game`}
           >
             <Star
               size={16}
@@ -419,11 +423,11 @@ const SearchBar = ({
                 ? "text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100"
                 : "text-gray-400 hover:text-red-500 hover:bg-red-50"
             }`}
-            title={isFavorited ? "Remove from favorites" : "Add to favorites"}
+            title={isFavorited ? "Remove from favorites" : "Added to favorites"}
             aria-label={
               isFavorited
-                ? `Remove ${game.name} from favorites`
-                : `Add ${game.name} to favorites`
+                ? `${game.name} Remove from favorites`
+                : `${game.name} Added to favorites`
             }
           >
             <Heart
@@ -437,8 +441,20 @@ const SearchBar = ({
     );
   };
 
+  const shouldShowSuggestions =
+    !isSearching && !searchTerm.trim() && showSuggestions;
+  const shouldShowSearchResults =
+    !isSearching && (searchTerm.trim() || selectedGenre) && showResults;
+  const hasAnyResults = searchResults.length > 0;
+  const hasRecentSearches = recentSearches.length > 0;
+  const hasPopularGames = popularGames.length > 0;
+
   return (
-    <div className="relative max-w-4xl mx-auto" ref={searchRef}>
+    <div
+      className="relative max-w-4xl mx-auto"
+      ref={searchRef}
+      style={{ zIndex: 99999 }}
+    >
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
@@ -451,14 +467,14 @@ const SearchBar = ({
               value={searchTerm}
               onChange={handleInputChange}
               onFocus={handleInputFocus}
-              placeholder="Oyun adı, janr və ya açar söz ilə axtarın..."
+              placeholder="Search by game name, genre or keyword..."
               className="w-full pl-12 pr-12 py-4 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all duration-300 border"
               style={{
                 backgroundColor: "rgba(255, 255, 255, 0.1)",
                 backdropFilter: "blur(10px)",
                 borderColor: "rgba(255, 255, 255, 0.2)",
               }}
-              aria-label="Search games"
+              aria-label="Oyun axtar"
               autoComplete="off"
             />
             {searchTerm && (
@@ -491,14 +507,18 @@ const SearchBar = ({
             <button
               key={genre.id}
               onClick={() => handlePopularGenreClick(genre)}
-              className={`px-3 py-1 rounded-full text-sm font-semibold transition-all duration-200 ease-in-out transform hover:scale-105 ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out transform hover:scale-105 border backdrop-blur-sm ${
                 selectedGenre === genre.id
-                  ? "bg-purple-700 text-white shadow-md"
-                  : "bg-purple-100 text-purple-800 hover:bg-purple-200 hover:shadow-sm"
+                  ? "bg-white bg-opacity-20 text-white border-white border-opacity-40 shadow-lg"
+                  : "bg-white bg-opacity-10 text-white border-white border-opacity-20 hover:bg-opacity-15 hover:border-opacity-30 shadow-md"
               }`}
+              style={{
+                backdropFilter: "blur(10px)",
+              }}
               aria-pressed={selectedGenre === genre.id}
-              aria-label={`Search popular genre ${genre.name}`}
+              aria-label={`${genre.name} janrında axtar`}
             >
+              <span className="mr-2 text-cyan-400">#</span>
               {genre.name}
             </button>
           ))}
@@ -532,13 +552,10 @@ const SearchBar = ({
                   id="genre-select"
                   value={selectedGenre}
                   onChange={(e) => handleFilterChange("genre", e.target.value)}
-                  className="w-full px-3 py-2 pr-8 rounded-lg bg-gray-900 bg-opacity-90 text-gray-200 border border-gray-700
-             focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-0
-             appearance-none transition-all duration-200 ease-in-out hover:border-gray-600 focus:border-cyan-500
-            "
+                  className="w-full px-3 py-2 pr-8 rounded-lg bg-gray-900 bg-opacity-90 text-gray-200 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-0 appearance-none transition-all duration-200 ease-in-out hover:border-gray-600 focus:border-cyan-500"
                 >
                   <option className="bg-gray-900 text-gray-200" value="">
-                    All Genres
+                    All genres
                   </option>
                   {genres.map((genre) => (
                     <option
@@ -556,16 +573,13 @@ const SearchBar = ({
                   htmlFor="sort-select"
                   className="block text-sm text-gray-300 mb-1"
                 >
-                  Sort By
+                  Sort
                 </label>
                 <select
                   id="sort-select"
                   value={sortBy}
                   onChange={(e) => handleFilterChange("sort", e.target.value)}
-                  className="w-full px-3 py-2 pr-8 rounded-lg bg-gray-900 bg-opacity-90 text-gray-200 border border-gray-700
-             focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-0
-             appearance-none transition-all duration-200 ease-in-out hover:border-gray-600 focus:border-cyan-500
-           "
+                  className="w-full px-3 py-2 pr-8 rounded-lg bg-gray-900 bg-opacity-90 text-gray-200 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-0 appearance-none transition-all duration-200 ease-in-out hover:border-gray-600 focus:border-cyan-500"
                 >
                   <option
                     className="bg-gray-900 text-gray-200"
@@ -577,7 +591,7 @@ const SearchBar = ({
                     className="bg-gray-900 text-gray-200 hover:bg-cyan-600 hover:text-white"
                     value="rating"
                   >
-                    Rating
+                    Raiting
                   </option>
                   <option
                     className="bg-gray-900 text-gray-200 hover:bg-cyan-600 hover:text-white"
@@ -588,6 +602,7 @@ const SearchBar = ({
                   <option
                     className="bg-gray-900 text-gray-200 hover:bg-cyan-600 hover:text-white"
                     value="metacritic"
+                    s
                   >
                     Metacritic Score
                   </option>
@@ -598,18 +613,17 @@ const SearchBar = ({
         </div>
       </div>
 
-      {/* Axtarış nəticələri və ya məsləhətlər */}
       <div
-        className={`absolute top-full left-0 right-0 mt-2 rounded-xl shadow-2xl overflow-y-auto z-[999] border
+        className={`absolute top-full left-0 right-0 mt-1 rounded-xl shadow-2xl overflow-y-auto border 
           bg-white bg-opacity-95 backdrop-blur
           transition-all duration-300 ease-in-out
           ${
-            (showResults && searchTerm.trim()) ||
-            (showSuggestions && !searchTerm.trim())
+            (shouldShowSearchResults && hasAnyResults) ||
+            (shouldShowSuggestions && (hasRecentSearches || hasPopularGames))
               ? "opacity-100 max-h-96 pointer-events-auto"
               : "opacity-0 max-h-0 pointer-events-none"
           }`}
-        style={{ borderColor: "rgba(255, 255, 255, 0.2)" }}
+        style={{ borderColor: "rgba(255, 255, 255, 0.2)", zIndex: "9999" }}
         role="listbox"
         aria-label="Search results"
         onScroll={onResultsScroll}
@@ -619,18 +633,17 @@ const SearchBar = ({
             <div className="text-center">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mb-4"></div>
               <div className="text-lg font-semibold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent animate-pulse">
-                Oyunlar axtarılır...
+                Searching game...
               </div>
             </div>
           </div>
         )}
 
-        {/* Axtarış nəticələri */}
-        {!isSearching && searchTerm.trim() && searchResults.length > 0 && (
+        {shouldShowSearchResults && hasAnyResults && (
           <div className="p-4 relative">
             <h3 className="text-gray-800 font-semibold mb-3 flex items-center gap-2">
               <Search size={16} />
-              {searchResults.length} oyun tapıldı
+              {searchResults.length} game found
             </h3>
             <div className="space-y-1">
               {searchResults
@@ -642,14 +655,13 @@ const SearchBar = ({
           </div>
         )}
 
-        {/* Məsləhətlər (son axtarışlar və məşhur oyunlar) */}
-        {!isSearching && !searchTerm.trim() && showSuggestions && (
+        {shouldShowSuggestions && (hasRecentSearches || hasPopularGames) && (
           <div className="p-4 relative">
-            {recentSearches.length > 0 && (
+            {hasRecentSearches && (
               <div className="mb-6">
                 <h3 className="text-gray-800 font-semibold mb-3 flex items-center gap-2">
                   <Clock size={16} className="text-blue-500" />
-                  Son axtarışlarınız
+                  Last searches
                 </h3>
                 <div className="space-y-1">
                   {recentSearches
@@ -661,11 +673,11 @@ const SearchBar = ({
               </div>
             )}
 
-            {popularGames.length > 0 && (
+            {hasPopularGames && (
               <div>
                 <h3 className="text-gray-800 font-semibold mb-3 flex items-center gap-2">
                   <TrendingUp size={16} className="text-orange-500" />
-                  Məşhur oyunlar
+                  Popular games
                 </h3>
                 <div className="space-y-1">
                   {popularGames
@@ -684,14 +696,24 @@ const SearchBar = ({
           </div>
         )}
 
-        {/* Heç nə tapılmadı */}
-        {!isSearching && searchTerm.trim() && searchResults.length === 0 && (
+        {shouldShowSearchResults && !hasAnyResults && (
           <div className="p-8 text-center">
             <div className="text-gray-500 italic text-lg">
-              Axtarışınıza uyğun oyun tapılmadı.
+              "{searchTerm}" no results found
             </div>
             <div className="text-gray-400 text-sm mt-2">
-              Başqa açar sözlər sınayın və ya filterləri təmizləyin.
+              Choose a different game or genre
+            </div>
+          </div>
+        )}
+
+        {shouldShowSuggestions && !hasRecentSearches && !hasPopularGames && (
+          <div className="p-8 text-center">
+            <div className="text-gray-500 italic text-lg">
+              You haven't searched for any gaames yet
+            </div>
+            <div className="text-gray-400 text-sm mt-2">
+              Start searching for games
             </div>
           </div>
         )}
@@ -701,7 +723,7 @@ const SearchBar = ({
             <div className="flex items-center gap-2 text-purple-600">
               <div className="w-6 h-6 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
               <span className="text-sm font-medium">
-                Daha çox oyun yüklənir...
+                Loading more results...
               </span>
             </div>
           </div>

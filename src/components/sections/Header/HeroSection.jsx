@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 
 import { getPopularGames } from "../../../utils/gameUtils";
 
-import { Gamepad2, Star, Users } from "lucide-react";
-
 import SearchBar from "../../../components/common/SearchBar";
+
+import { Gamepad2, Star, Users } from "lucide-react";
 
 const heroImages = [
   "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&h=400&fit=crop&crop=center",
@@ -58,9 +58,17 @@ const HeroSection = ({
   }, []);
 
   useEffect(() => {
-    if (allGames?.length) {
-      const popular = getPopularGames(allGames, 4);
-      setPopularGames(popular);
+    if (allGames?.length > 0) {
+      try {
+        const popular = getPopularGames(allGames, 7);
+        setPopularGames(popular);
+      } catch (error) {
+        console.error("Popular games calculation error:", error);
+        const fallbackPopular = [...allGames]
+          .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+          .slice(0, 7);
+        setPopularGames(fallbackPopular);
+      }
     }
   }, [allGames]);
 
@@ -129,9 +137,9 @@ const HeroSection = ({
                 isGameFavorited={isGameFavorited}
                 formatDate={formatDate}
                 openRatingModal={openRatingModal}
+                popularGames={popularGames}
                 recentSearches={recentSearches}
                 onAddRecentSearch={handleAddRecentSearch}
-                getPopularGames={() => allGames}
               />
 
               {!loading && (
