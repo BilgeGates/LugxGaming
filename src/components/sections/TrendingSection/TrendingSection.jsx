@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+
 import useGameData from "../../../hooks/useGameData";
 import useFavorites from "../../../hooks/useFavorites";
 import useRating from "../../../hooks/useRating";
 import useRecentViews from "../../../hooks/useRecentViews";
+
 import GameCard from "../../common/GameCard";
 import RatingModal from "../../common/RatingModal";
-import { TrendingUp, Gamepad2, ArrowRight } from "lucide-react";
+
+import { ExploreButton } from "../../ui/index";
+
+import { TrendingUp } from "lucide-react";
 
 const TrendingSection = () => {
   const { allGames, loading, error } = useGameData();
@@ -97,11 +102,7 @@ const TrendingSection = () => {
           </p>
 
           <Link to="/products">
-            <button className="group relative inline-flex items-center gap-3 bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-4 rounded-2xl transition-all duration-300 transform hover:scale-105">
-              <Gamepad2 size={20} className="group-hover:animate-bounce" />
-              <span>Explore All Games</span>
-              <ArrowRight size={20} />
-            </button>
+            <ExploreButton>Explore All Games</ExploreButton>
           </Link>
         </div>
 
