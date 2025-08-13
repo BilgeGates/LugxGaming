@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+
+import { getPopularGames } from "../../../utils/gameUtils";
+
 import { Gamepad2, Star, Users } from "lucide-react";
 
 import SearchBar from "../../../components/common/SearchBar";
@@ -36,6 +39,15 @@ const HeroSection = ({
   formatDate,
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [recentSearches, setRecentSearches] = useState([]);
+  const [popularGames, setPopularGames] = useState([]);
+
+  const handleAddRecentSearch = (game) => {
+    setRecentSearches((prev) => {
+      const filtered = prev.filter((g) => g.id !== game.id);
+      return [game, ...filtered].slice(0, 5);
+    });
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -44,6 +56,13 @@ const HeroSection = ({
 
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (allGames?.length) {
+      const popular = getPopularGames(allGames, 4);
+      setPopularGames(popular);
+    }
+  }, [allGames]);
 
   return (
     <header className="relative z-10 pt-20">
@@ -110,6 +129,9 @@ const HeroSection = ({
                 isGameFavorited={isGameFavorited}
                 formatDate={formatDate}
                 openRatingModal={openRatingModal}
+                recentSearches={recentSearches}
+                onAddRecentSearch={handleAddRecentSearch}
+                getPopularGames={() => allGames}
               />
 
               {!loading && (
