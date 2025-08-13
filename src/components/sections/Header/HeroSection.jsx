@@ -84,7 +84,7 @@ const HeroSection = ({
               <div className="flex items-center gap-2 text-cyan-400">
                 <Gamepad2 size={24} />
                 <span className="text-sm font-semibold tracking-wider uppercase">
-                  Welcome to Lugx
+                  Welcome to Play Guide
                 </span>
               </div>
               <h1 className="text-5xl lg:text-7xl font-bold text-white leading-tight">
