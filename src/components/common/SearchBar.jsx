@@ -7,6 +7,8 @@ import {
   Star,
   Heart,
   Calendar,
+  TrendingUp,
+  Clock,
 } from "lucide-react";
 
 const genres = [
@@ -41,11 +43,16 @@ const SearchBar = ({
   toggleFavorite,
   isGameFavorited,
   formatDate,
+  // Yeni proplar məsləhət üçün
+  popularGames = [], // API-dən gələn məşhur oyunlar
+  recentSearches = [], // Son axtarışlar
+  onAddRecentSearch, // Son axtarışa əlavə etmək üçün
 }) => {
   const searchRef = useRef(null);
   const searchTimeoutRef = useRef(null);
   const [selectedResultIndex, setSelectedResultIndex] = useState(-1);
   const [isSearching, setIsSearching] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const [visibleCount, setVisibleCount] = useState(7);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -61,23 +68,31 @@ const SearchBar = ({
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setShowResults(false);
         setShowFilters(false);
+        setShowSuggestions(false);
         setSelectedResultIndex(-1);
       }
     };
 
     const handleKeyDown = (event) => {
-      if (!showResults || searchResults.length === 0) return;
+      const currentResults = searchTerm.trim()
+        ? searchResults
+        : [...recentSearches, ...popularGames];
 
-      // eslint-disable-next-line default-case
+      if ((!showResults && !showSuggestions) || currentResults.length === 0)
+        return;
+
       switch (event.key) {
         case "Escape":
           setShowResults(false);
+          setShowSuggestions(false);
           setSelectedResultIndex(-1);
           break;
         case "ArrowDown":
           event.preventDefault();
           setSelectedResultIndex((prev) =>
-            prev < visibleCount - 1 ? prev + 1 : prev
+            prev < Math.min(visibleCount - 1, currentResults.length - 1)
+              ? prev + 1
+              : prev
           );
           break;
         case "ArrowUp":
@@ -86,11 +101,17 @@ const SearchBar = ({
           break;
         case "Enter":
           event.preventDefault();
-          if (selectedResultIndex >= 0) {
-            handleGameSelect(searchResults[selectedResultIndex]);
+          if (selectedResultIndex >= 0 && currentResults[selectedResultIndex]) {
+            handleGameSelect(currentResults[selectedResultIndex]);
+            if (onAddRecentSearch) {
+              onAddRecentSearch(currentResults[selectedResultIndex]);
+            }
             setShowResults(false);
+            setShowSuggestions(false);
             setSelectedResultIndex(-1);
           }
+          break;
+        default:
           break;
       }
     };
@@ -106,10 +127,15 @@ const SearchBar = ({
     setShowResults,
     setShowFilters,
     showResults,
+    showSuggestions,
     searchResults,
     selectedResultIndex,
     handleGameSelect,
     visibleCount,
+    searchTerm,
+    recentSearches,
+    popularGames,
+    onAddRecentSearch,
   ]);
 
   const debouncedSearch = useCallback(
@@ -118,6 +144,7 @@ const SearchBar = ({
 
       if (value.trim() || genre) {
         setIsSearching(true);
+        setShowSuggestions(false);
       }
 
       searchTimeoutRef.current = setTimeout(async () => {
@@ -139,23 +166,32 @@ const SearchBar = ({
 
       if (value.trim()) {
         setShowResults(true);
+        setShowSuggestions(false);
         debouncedSearch(value, selectedGenre, sortBy);
       } else {
         setShowResults(false);
+        setShowSuggestions(true);
         setIsSearching(false);
-        debouncedSearch("", "", "relevance");
       }
     },
     [setSearchTerm, selectedGenre, sortBy, debouncedSearch, setShowResults]
   );
 
+  const handleInputFocus = useCallback(() => {
+    if (!searchTerm.trim()) {
+      setShowSuggestions(true);
+      setShowResults(false);
+    }
+  }, [searchTerm]);
+
   const handleClearSearch = useCallback(() => {
     if (clearSearch) clearSearch();
     setShowResults(false);
+    setShowSuggestions(true);
     setSelectedResultIndex(-1);
     setVisibleCount(7);
     setIsSearching(false);
-  }, [clearSearch, setShowResults]);
+  }, [clearSearch]);
 
   const handleFilterChange = useCallback(
     (filterType, value) => {
@@ -168,8 +204,10 @@ const SearchBar = ({
       if (searchTerm.trim() || newGenre || newSort !== "relevance") {
         debouncedSearch(searchTerm, newGenre, newSort);
         setShowResults(true);
+        setShowSuggestions(false);
       } else {
         setShowResults(false);
+        setShowSuggestions(true);
         setIsSearching(false);
       }
     },
@@ -180,18 +218,21 @@ const SearchBar = ({
       setSelectedGenre,
       setSortBy,
       debouncedSearch,
-      setShowResults,
     ]
   );
 
   const handleResultClick = useCallback(
     (game) => {
       handleGameSelect(game);
+      if (onAddRecentSearch) {
+        onAddRecentSearch(game);
+      }
       setShowResults(false);
+      setShowSuggestions(false);
       setSelectedResultIndex(-1);
       setVisibleCount(7);
     },
-    [handleGameSelect, setShowResults]
+    [handleGameSelect, onAddRecentSearch]
   );
 
   const handleFavoriteToggle = useCallback(
@@ -234,23 +275,166 @@ const SearchBar = ({
     setSelectedGenre(genre.id);
     setSearchTerm("");
     setShowResults(false);
+    setShowSuggestions(false);
     if (handleSearch) handleSearch("", genre.id, sortBy);
     setVisibleCount(7);
   };
 
   const onResultsScroll = (e) => {
     const target = e.target;
+    const currentResults = searchTerm.trim()
+      ? searchResults
+      : [...recentSearches, ...popularGames];
+
     if (
       !loadingMore &&
       target.scrollTop + target.clientHeight >= target.scrollHeight - 20 &&
-      visibleCount < searchResults.length
+      visibleCount < currentResults.length
     ) {
       setLoadingMore(true);
       setTimeout(() => {
-        setVisibleCount((v) => Math.min(v + 7, searchResults.length));
+        setVisibleCount((v) => Math.min(v + 7, currentResults.length));
         setLoadingMore(false);
       }, 700);
     }
+  };
+
+  const renderGameItem = (game, index, isRecent = false, isPopular = false) => {
+    if (!game || !game.id) return null;
+
+    const userRating = safeGetUserRating(game.id);
+    const isFavorited = safeIsGameFavorited(game.id);
+
+    return (
+      <div
+        key={`${isRecent ? "recent" : isPopular ? "popular" : "search"}-${
+          game.id
+        }-${index}`}
+        className={`flex items-center gap-4 p-3 rounded-lg cursor-pointer transition-all duration-200 ease-in-out group opacity-0 animate-fadeIn hover:shadow-md ${
+          selectedResultIndex === index
+            ? "bg-purple-100 transform scale-102"
+            : "hover:bg-gray-50"
+        }`}
+        style={{
+          animationDelay: `${index * 50}ms`,
+          animationFillMode: "forwards",
+        }}
+        onClick={() => handleResultClick(game)}
+        role="option"
+        aria-selected={selectedResultIndex === index}
+      >
+        {(isRecent || isPopular) && (
+          <div className="flex-shrink-0">
+            {isRecent ? (
+              <Clock size={16} className="text-blue-500" />
+            ) : (
+              <TrendingUp size={16} className="text-orange-500" />
+            )}
+          </div>
+        )}
+
+        <img
+          src={
+            game.background_image ||
+            "https://via.placeholder.com/64x40?text=No+Image"
+          }
+          alt={game.name || "Game image"}
+          className="w-16 h-10 object-cover rounded-md shadow-sm transition-transform duration-200 ease-in-out group-hover:scale-105"
+          onError={(e) => {
+            e.target.src = "https://via.placeholder.com/64x40?text=No+Image";
+          }}
+        />
+
+        <div className="flex-1">
+          <h4 className="font-semibold text-gray-800 group-hover:text-purple-600 transition-colors duration-200 ease-in-out">
+            {game.name || "Unknown Game"}
+            {isRecent && (
+              <span className="ml-2 text-xs text-blue-500 font-normal">
+                (Son axtarış)
+              </span>
+            )}
+            {isPopular && (
+              <span className="ml-2 text-xs text-orange-500 font-normal">
+                (Məşhur)
+              </span>
+            )}
+          </h4>
+          <div className="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
+            {game.genres && game.genres.length > 0 && (
+              <span className="flex items-center gap-1">
+                <Gamepad2 size={14} />
+                {game.genres[0].name}
+              </span>
+            )}
+            {game.rating > 0 && (
+              <span
+                className={`flex items-center gap-1 ${safeGetRatingColor(
+                  game.rating
+                )}`}
+              >
+                <Star size={14} />
+                {game.rating.toFixed(1)}
+              </span>
+            )}
+            {game.released && (
+              <span className="flex items-center gap-1">
+                <Calendar size={14} />
+                {formatDate
+                  ? formatDate(game.released)
+                  : new Date(game.released).getFullYear()}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {userRating > 0 && (
+            <div className="flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs select-none">
+              <Star size={12} fill="currentColor" />
+              {userRating.toFixed(1)}
+            </div>
+          )}
+
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (openRatingModal) openRatingModal(game, e);
+            }}
+            title="Rate this game"
+            className="p-2 rounded-full text-yellow-500 hover:text-yellow-600 transition-all duration-200 ease-in-out hover:bg-yellow-50 hover:scale-110"
+            aria-label={`Rate ${game.name} game`}
+          >
+            <Star
+              size={16}
+              fill={userRating > 0 ? "currentColor" : "none"}
+              stroke="currentColor"
+            />
+          </button>
+
+          <button
+            onClick={(e) => handleFavoriteToggle(e, game)}
+            className={`p-2 rounded-full transition-all duration-200 ease-in-out hover:scale-110 ${
+              isFavorited
+                ? "text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100"
+                : "text-gray-400 hover:text-red-500 hover:bg-red-50"
+            }`}
+            title={isFavorited ? "Remove from favorites" : "Add to favorites"}
+            aria-label={
+              isFavorited
+                ? `Remove ${game.name} from favorites`
+                : `Add ${game.name} to favorites`
+            }
+          >
+            <Heart
+              size={16}
+              fill={isFavorited ? "currentColor" : "none"}
+              stroke="currentColor"
+            />
+          </button>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -266,7 +450,8 @@ const SearchBar = ({
               type="text"
               value={searchTerm}
               onChange={handleInputChange}
-              placeholder="Search games by name, genre, or keyword..."
+              onFocus={handleInputFocus}
+              placeholder="Oyun adı, janr və ya açar söz ilə axtarın..."
               className="w-full pl-12 pr-12 py-4 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all duration-300 border"
               style={{
                 backgroundColor: "rgba(255, 255, 255, 0.1)",
@@ -413,12 +598,14 @@ const SearchBar = ({
         </div>
       </div>
 
+      {/* Axtarış nəticələri və ya məsləhətlər */}
       <div
-        className={`absolute top-full left-0 right-0 mt-2 rounded-xl shadow-2xl overflow-y-auto z-50 border
+        className={`absolute top-full left-0 right-0 mt-2 rounded-xl shadow-2xl overflow-y-auto z-[999] border
           bg-white bg-opacity-95 backdrop-blur
           transition-all duration-300 ease-in-out
           ${
-            showResults && (searchTerm.trim() || selectedGenre)
+            (showResults && searchTerm.trim()) ||
+            (showSuggestions && !searchTerm.trim())
               ? "opacity-100 max-h-96 pointer-events-auto"
               : "opacity-0 max-h-0 pointer-events-none"
           }`}
@@ -432,161 +619,93 @@ const SearchBar = ({
             <div className="text-center">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mb-4"></div>
               <div className="text-lg font-semibold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent animate-pulse">
-                Searching for games...
+                Oyunlar axtarılır...
               </div>
             </div>
           </div>
         )}
 
-        {!isSearching && searchResults.length > 0 ? (
+        {/* Axtarış nəticələri */}
+        {!isSearching && searchTerm.trim() && searchResults.length > 0 && (
           <div className="p-4 relative">
             <h3 className="text-gray-800 font-semibold mb-3 flex items-center gap-2">
               <Search size={16} />
-              Found {searchResults.length} games
+              {searchResults.length} oyun tapıldı
             </h3>
             <div className="space-y-1">
-              {searchResults.slice(0, visibleCount).map((game, index) => {
-                if (!game || !game.id) return null;
-
-                const userRating = safeGetUserRating(game.id);
-                const isFavorited = safeIsGameFavorited(game.id);
-
-                return (
-                  <div
-                    key={game.id}
-                    className={`flex items-center gap-4 p-3 rounded-lg cursor-pointer transition-all duration-200 ease-in-out group opacity-0 animate-fadeIn hover:shadow-md ${
-                      selectedResultIndex === index
-                        ? "bg-purple-100 transform scale-102"
-                        : "hover:bg-gray-50"
-                    }`}
-                    style={{
-                      animationDelay: `${index * 100}ms`,
-                      animationFillMode: "forwards",
-                    }}
-                    onClick={() => handleResultClick(game)}
-                    role="option"
-                    aria-selected={selectedResultIndex === index}
-                  >
-                    <img
-                      src={
-                        game.background_image ||
-                        "https://via.placeholder.com/64x40?text=No+Image"
-                      }
-                      alt={game.name || "Game image"}
-                      className="w-16 h-10 object-cover rounded-md shadow-sm transition-transform duration-200 ease-in-out group-hover:scale-105"
-                      onError={(e) => {
-                        e.target.src =
-                          "https://via.placeholder.com/64x40?text=No+Image";
-                      }}
-                    />
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-800 group-hover:text-purple-600 transition-colors duration-200 ease-in-out">
-                        {game.name || "Unknown Game"}
-                      </h4>
-                      <div className="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
-                        {game.genres && game.genres.length > 0 && (
-                          <span className="flex items-center gap-1">
-                            <Gamepad2 size={14} />
-                            {game.genres[0].name}
-                          </span>
-                        )}
-                        {game.rating > 0 && (
-                          <span
-                            className={`flex items-center gap-1 ${safeGetRatingColor(
-                              game.rating
-                            )}`}
-                          >
-                            <Star size={14} />
-                            {game.rating.toFixed(1)}
-                          </span>
-                        )}
-                        {game.released && (
-                          <span className="flex items-center gap-1">
-                            <Calendar size={14} />
-                            {formatDate
-                              ? formatDate(game.released)
-                              : new Date(game.released).getFullYear()}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {userRating > 0 && (
-                        <div className="flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs select-none">
-                          <Star size={12} fill="currentColor" />
-                          {userRating.toFixed(1)}
-                        </div>
-                      )}
-
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          if (openRatingModal) openRatingModal(game, e);
-                        }}
-                        title="Rate this game"
-                        className="p-2 rounded-full text-yellow-500 hover:text-yellow-600 transition-all duration-200 ease-in-out hover:bg-yellow-50 hover:scale-110"
-                        aria-label={`Rate ${game.name} game`}
-                      >
-                        <Star
-                          size={16}
-                          fill={userRating > 0 ? "currentColor" : "none"}
-                          stroke="currentColor"
-                        />
-                      </button>
-
-                      <button
-                        onClick={(e) => handleFavoriteToggle(e, game)}
-                        className={`p-2 rounded-full transition-all duration-200 ease-in-out hover:scale-110 ${
-                          isFavorited
-                            ? "text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100"
-                            : "text-gray-400 hover:text-red-500 hover:bg-red-50"
-                        }`}
-                        title={
-                          isFavorited
-                            ? "Remove from favorites"
-                            : "Add to favorites"
-                        }
-                        aria-label={
-                          isFavorited
-                            ? `Remove ${game.name} from favorites`
-                            : `Add ${game.name} to favorites`
-                        }
-                      >
-                        <Heart
-                          size={16}
-                          fill={isFavorited ? "currentColor" : "none"}
-                          stroke="currentColor"
-                        />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+              {searchResults
+                .slice(0, visibleCount)
+                .map((game, index) =>
+                  renderGameItem(game, index, false, false)
+                )}
             </div>
+          </div>
+        )}
 
-            {loadingMore && (
-              <div className="absolute bottom-0 left-0 right-0 bg-white bg-opacity-90 flex justify-center items-center p-3 rounded-b-xl pointer-events-none">
-                <div className="flex items-center gap-2 text-purple-600">
-                  <div className="w-6 h-6 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
-                  <span className="text-sm font-medium">
-                    Loading more games...
-                  </span>
+        {/* Məsləhətlər (son axtarışlar və məşhur oyunlar) */}
+        {!isSearching && !searchTerm.trim() && showSuggestions && (
+          <div className="p-4 relative">
+            {recentSearches.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-gray-800 font-semibold mb-3 flex items-center gap-2">
+                  <Clock size={16} className="text-blue-500" />
+                  Son axtarışlarınız
+                </h3>
+                <div className="space-y-1">
+                  {recentSearches
+                    .slice(0, Math.min(3, visibleCount))
+                    .map((game, index) =>
+                      renderGameItem(game, index, true, false)
+                    )}
+                </div>
+              </div>
+            )}
+
+            {popularGames.length > 0 && (
+              <div>
+                <h3 className="text-gray-800 font-semibold mb-3 flex items-center gap-2">
+                  <TrendingUp size={16} className="text-orange-500" />
+                  Məşhur oyunlar
+                </h3>
+                <div className="space-y-1">
+                  {popularGames
+                    .slice(0, visibleCount - Math.min(3, recentSearches.length))
+                    .map((game, index) =>
+                      renderGameItem(
+                        game,
+                        recentSearches.length + index,
+                        false,
+                        true
+                      )
+                    )}
                 </div>
               </div>
             )}
           </div>
-        ) : !isSearching && (searchTerm.trim() || selectedGenre) ? (
+        )}
+
+        {/* Heç nə tapılmadı */}
+        {!isSearching && searchTerm.trim() && searchResults.length === 0 && (
           <div className="p-8 text-center">
             <div className="text-gray-500 italic text-lg">
-              No games found matching your search.
+              Axtarışınıza uyğun oyun tapılmadı.
             </div>
             <div className="text-gray-400 text-sm mt-2">
-              Try different keywords or clear your filters.
+              Başqa açar sözlər sınayın və ya filterləri təmizləyin.
             </div>
           </div>
-        ) : null}
+        )}
+
+        {loadingMore && (
+          <div className="absolute bottom-0 left-0 right-0 bg-white bg-opacity-90 flex justify-center items-center p-3 rounded-b-xl pointer-events-none">
+            <div className="flex items-center gap-2 text-purple-600">
+              <div className="w-6 h-6 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-sm font-medium">
+                Daha çox oyun yüklənir...
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       <style jsx>{`
