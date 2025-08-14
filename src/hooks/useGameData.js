@@ -46,7 +46,7 @@ const useGameData = () => {
       }
     };
     fetchGames();
-  }, []);
+  }, [error]);
 
   const searchGames = async (term, genre = "", sort = "relevance") => {
     console.log("searchGames called:", { term, genre, sort }); // ①

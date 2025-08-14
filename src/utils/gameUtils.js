@@ -16,6 +16,14 @@ import {
   Target,
 } from "lucide-react";
 
+import {
+  FaWindows,
+  FaPlaystation,
+  FaXbox,
+  FaInnosoft,
+  FaMobileAlt,
+} from "react-icons/fa";
+
 /**
  * Genre icon mapping
  */
@@ -237,4 +245,46 @@ export const getPopularGames = (games, limit = 4) =>
  */
 export const getTrendingGames = (games, limit = 10) => {
   return sortGames(games, "popularity").slice(0, limit);
+};
+
+/**
+ * Format release date
+ */
+export const formatReleaseDate = (dateString) => {
+  if (!dateString) return "Unknown";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
+
+/**
+ * Get platform icon
+ */
+export const getPlatformIcon = (platformName) => {
+  const icons = {
+    PC: FaWindows,
+    PlayStation: FaPlaystation,
+    Xbox: FaXbox,
+    Nintendo: FaInnosoft,
+    Mobile: FaMobileAlt,
+  };
+  return icons[platformName] || "Gamepad2";
+};
+
+/**
+ * Get genre gradient
+ */
+export const getGenreGradient = (genreName) => {
+  const gradients = {
+    Action: "from-red-500 to-orange-500",
+    Adventure: "from-green-500 to-blue-500",
+    RPG: "from-purple-500 to-pink-500",
+    Shooter: "from-yellow-500 to-red-500",
+    Strategy: "from-blue-500 to-indigo-500",
+    Default: "from-gray-500 to-gray-700",
+  };
+  return gradients[genreName] || gradients.Default;
 };
