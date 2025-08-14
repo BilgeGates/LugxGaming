@@ -1,42 +1,71 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { Heart, Star, Zap } from "lucide-react";
-import { ActionButton } from "./ActionButton";
+
+import { ActionButton } from "../ui";
 
 export const CardOverlay = ({
-  onFavorite,
+  game,
+  onSelect,
   onRate,
-  onView,
-  isFavorited,
-  userRating,
-  show = false,
+  onToggleFavorite,
+  isFavorited = false,
+  getUserRating = () => 0,
+  className = "",
 }) => {
+  const [overlayVisible, setOverlayVisible] = useState(false);
+  const navigate = useNavigate();
+
+  const handleGameSelect = (e) => {
+    e.stopPropagation();
+    onSelect?.(game);
+    navigate(`/products/${game.id}`);
+  };
+
+  const handleRatingClick = (e) => {
+    e.stopPropagation();
+    onRate?.(game, e);
+  };
+
+  const handleFavoriteClick = (e) => {
+    e.stopPropagation();
+    onToggleFavorite?.(game);
+  };
+
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      setOverlayVisible(!overlayVisible);
+    }
+  };
+
   return (
     <div
-      className={`absolute inset-0 bg-black/60 transition-opacity duration-300 flex items-center justify-center gap-3 ${
-        show ? "opacity-100" : "opacity-0"
-      }`}
+      className={`absolute inset-0 bg-black/60 opacity-0 group-hover/image:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 ${className}`}
+      onClick={handleOverlayClick}
     >
       <ActionButton
         icon={Heart}
-        onClick={onFavorite}
+        onClick={handleFavoriteClick}
         title={isFavorited ? "Remove from favorites" : "Add to favorites"}
         variant="favorite"
         active={isFavorited}
+        size="md"
       />
-
       <ActionButton
         icon={Star}
-        onClick={onRate}
+        onClick={handleRatingClick}
         title="Rate this game"
         variant="rating"
-        active={userRating > 0}
+        active={getUserRating(game.id) > 0}
+        size="md"
       />
-
       <ActionButton
         icon={Zap}
-        onClick={onView}
+        onClick={handleGameSelect}
         title="View game details"
         variant="primary"
+        size="md"
       />
     </div>
   );

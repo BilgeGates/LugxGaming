@@ -1,4 +1,5 @@
 import React from "react";
+
 import { Star } from "lucide-react";
 
 export const RatingBadge = ({ rating, size = "sm" }) => {
@@ -12,7 +13,7 @@ export const RatingBadge = ({ rating, size = "sm" }) => {
 
   return (
     <div
-      className={`inline-flex items-center gap-1 bg-yellow-500/20 text-yellow-400 ${sizeClasses[size]} rounded-full backdrop-blur-sm`}
+      className={`absolute top-2 left-2 inline-flex items-center gap-1 bg-yellow-500/20 text-yellow-400 ${sizeClasses[size]} rounded-full backdrop-blur-sm`}
     >
       <Star size={iconSizes[size]} fill="currentColor" />
       <span>{rating.toFixed(1)}</span>

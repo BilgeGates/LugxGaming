@@ -2,34 +2,27 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 import {
-  ActionButton,
+  CardOverlay,
+  ExploreButton,
   RatingBadge,
   MetacriticScore,
   GameStats,
   GenreBadge,
 } from "../ui/index";
 
-import { Star, Heart, Trophy, Zap } from "lucide-react";
-
 const GameCard = ({
   game,
-  onSelect,
-  onRate,
-  onToggleFavorite,
-  isFavorited = false,
   getUserRating = () => 0,
   showActions = true,
   animated = false,
   className = "",
+  onGameSelect,
+  onRate,
+  onToggleFavorite,
+  isFavorited = false,
 }) => {
-  const handleGameSelect = () => onSelect?.(game);
-  const handleRatingClick = (e) => {
-    e.stopPropagation();
-    onRate?.(game, e);
-  };
-  const handleFavoriteClick = (e) => {
-    e.stopPropagation();
-    onToggleFavorite?.(game);
+  const handleExploreClick = () => {
+    onGameSelect?.(game);
   };
 
   return (
@@ -55,33 +48,14 @@ const GameCard = ({
             />
 
             {showActions && (
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/image:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
-                <ActionButton
-                  icon={Heart}
-                  onClick={handleFavoriteClick}
-                  title={
-                    isFavorited ? "Remove from favorites" : "Add to favorites"
-                  }
-                  variant="favorite"
-                  active={isFavorited}
-                  size="md"
-                />
-                <ActionButton
-                  icon={Star}
-                  onClick={handleRatingClick}
-                  title="Rate this game"
-                  variant="rating"
-                  active={getUserRating(game.id) > 0}
-                  size="md"
-                />
-                <ActionButton
-                  icon={Zap}
-                  onClick={handleGameSelect}
-                  title="View game details"
-                  variant="primary"
-                  size="md"
-                />
-              </div>
+              <CardOverlay
+                game={game}
+                onSelect={onGameSelect}
+                onRate={onRate}
+                onToggleFavorite={onToggleFavorite}
+                isFavorited={isFavorited}
+                getUserRating={getUserRating}
+              />
             )}
 
             {game.rating && <RatingBadge rating={game.rating} />}
@@ -103,12 +77,9 @@ const GameCard = ({
             <GameStats game={game} getUserRating={getUserRating} />
           </div>
 
-          <Link to={`/products/${game.id}`}>
-            <button className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2">
-              <Trophy size={16} />
-              Explore Now
-            </button>
-          </Link>
+          <ExploreButton variant="cardButton" onClick={handleExploreClick}>
+            Explore Now
+          </ExploreButton>
         </div>
 
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>

@@ -1,6 +1,6 @@
 import React from "react";
 
-export const LoadingSpinner = ({ size = "md", text = "Loading..." }) => {
+export const LoadingSpinner = ({ size = "md", text = "Loading games..." }) => {
   const sizeClasses = { sm: "w-8 h-8", md: "w-16 h-16", lg: "w-24 h-24" };
   return (
     <div className="flex flex-col items-center gap-4 py-16">

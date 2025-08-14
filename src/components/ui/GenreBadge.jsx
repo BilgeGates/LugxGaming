@@ -4,10 +4,15 @@ export const GenreBadge = ({ genre }) => {
   if (!genre) return null;
 
   return (
-    <div className="bg-cyan-400">
-      <span className="inline-flex items-center gap-1 px-2 py-1 rounded  text-white text-xs  bg-transparent font-medium">
-        {genre.name}
-      </span>
+    <div
+      key={genre.id}
+      className="px-4 py-2 rounded-lg text-sm font-medium border"
+      style={{
+        backdropFilter: "blur(10px)",
+      }}
+    >
+      <span className="mr-2 text-cyan-400">#</span>
+      <span className="text-white">{genre.name}</span>
     </div>
   );
 };

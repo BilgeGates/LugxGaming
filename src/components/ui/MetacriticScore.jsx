@@ -19,7 +19,9 @@ export const MetacriticScore = ({ score, size = "sm" }) => {
     <div
       className={`${getColor(
         score
-      )} text-white font-bold rounded-lg backdrop-blur-sm ${sizeClasses[size]}`}
+      )} absolute top-2 right-2 text-white font-bold rounded-lg backdrop-blur-sm ${
+        sizeClasses[size]
+      }`}
       title={`Metacritic Score: ${score}`}
     >
       {score}
