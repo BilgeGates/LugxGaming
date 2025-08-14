@@ -97,6 +97,15 @@ const Navbar = () => {
             Home
           </NavLink>
           <NavLink
+            to="/about"
+            {...navLinkClass({
+              isActive: window.location.pathname === "/about",
+            })}
+            onClick={() => setMenuOpen(false)}
+          >
+            About
+          </NavLink>
+          <NavLink
             to="/products"
             {...navLinkClass({
               isActive: window.location.pathname === "/products",
@@ -142,6 +151,19 @@ const Navbar = () => {
               }
             >
               Home
+            </NavLink>
+            <NavLink
+              to="/about"
+              onClick={() => setMenuOpen(false)}
+              className={({ isActive }) =>
+                `block px-6 py-4 text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-cyan-50 transition-all duration-300 ${
+                  isActive
+                    ? "bg-gradient-to-r from-purple-100 to-cyan-100 font-semibold text-purple-700"
+                    : ""
+                }`
+              }
+            >
+              About
             </NavLink>
             <NavLink
               to="/products"
