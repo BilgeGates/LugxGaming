@@ -288,3 +288,20 @@ export const getGenreGradient = (genreName) => {
   };
   return gradients[genreName] || gradients.Default;
 };
+
+export const sanitizeGenreName = (genre) =>
+  genre
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "-")
+    .replace(/-+/g, "-");
+
+export const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
+export const formatRatingScore = (rating) => Math.round(rating * 20);
+
+export const getRatingColor = (rating) => {
+  const score = rating * 20;
+  if (score >= 80) return "text-green-400";
+  if (score >= 60) return "text-yellow-400";
+  return "text-red-400";
+};
