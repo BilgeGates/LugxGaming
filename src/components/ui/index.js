@@ -1,6 +1,5 @@
 export { LoadingSpinner } from "./LoadingSpinner";
 export { ErrorMessage } from "./ErrorMessage";
-export { PlatformBadge } from "./PlatformBadge";
 export { GenreBadge } from "./GenreBadge";
 export { RatingBadge } from "./RatingBadge";
 export { MetacriticScore } from "./MetacriticScore";
@@ -8,8 +7,4 @@ export { ActionButton } from "./ActionButton";
 export { ExploreButton } from "./ExploreButton";
 export { GameStats } from "./GameStats";
 export { CardOverlay } from "./CardOverlay";
-export { AnimatedCounter } from "./AnimatedCounter";
-export { GradientBackground } from "./GradientBackground";
 export { SectionHeader } from "./SectionHeader";
-export { EmptyState } from "./EmptyState";
-export { QuickStats } from "./QuickStats";
