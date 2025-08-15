@@ -58,7 +58,7 @@ const TrendingSection = () => {
   }, [loading, visibleGames, visibleGames.length]);
 
   return (
-    <section className="relative min-h-[700px] overflow-hidden">
+    <section className="relative min-h-[700px] overflow-hidden -z-[9999]">
       <div className="relative z-10 container mx-auto max-w-7xl px-6 py-20">
         <SectionHeader
           subtitle="Trending Now"
