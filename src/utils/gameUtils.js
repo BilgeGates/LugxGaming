@@ -20,7 +20,7 @@ import {
   FaWindows,
   FaPlaystation,
   FaXbox,
-  FaNintendoSwitch,
+  FaFacebook,
   FaMobileAlt,
   FaAndroid,
   FaApple,
@@ -474,9 +474,9 @@ export const getPlatformIcon = (platforms) => {
     "xbox series": FaXbox,
     "xbox 360": FaXbox,
 
-    nintendo: FaNintendoSwitch,
-    "nintendo switch": FaNintendoSwitch,
-    switch: FaNintendoSwitch,
+    nintendo: FaFacebook,
+    "nintendo switch": FaFacebook,
+    switch: FaFacebook,
 
     // Mobile platforms
     android: FaAndroid,
