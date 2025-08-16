@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Navbar from "../../layout/Navbar/Navbar";
 import Footer from "../../layout/Footer/Footer";
@@ -48,36 +48,37 @@ const Products = () => {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [selectedGame, setSelectedGame] = useState(null);
 
-  // Custom hooks
+  // Custom hooks with error handling
   const gameData = useGameData();
-  const { favorites, toggleFavorite, isGameFavorited } = useFavorites();
+  const { favorites, toggleFavorite, isGameFavorited } = useFavorites() || {};
   const {
     submitRating,
     getUserRating,
     getRatingColor: getCustomRatingColor,
-  } = useRating();
-  const { addToRecentViews } = useRecentViews();
+  } = useRating() || {};
+  const { addToRecentViews } = useRecentViews() || {};
 
-  // Extract from gameData hook
+  // Extract from gameData hook with fallbacks
   const {
-    allGames,
-    loading,
-    searchTerm,
+    allGames = [],
+    loading = false,
+    error = null,
+    searchTerm = "",
     setSearchTerm,
-    showFilters,
+    showFilters = false,
     setShowFilters,
-    selectedGenre,
+    selectedGenre = "",
     setSelectedGenre,
-    sortBy,
+    sortBy = "popularity",
     setSortBy,
-    searchResults,
-    showResults,
+    searchResults = [],
+    showResults = false,
     setShowResults,
     searchGames,
     clearSearch,
-    genres,
+    genres = [],
     formatDate,
-  } = gameData;
+  } = gameData || {};
 
   // Check URL parameters on component mount
   useEffect(() => {
@@ -86,60 +87,32 @@ const Products = () => {
     if (filterFromUrl && genreMapping[filterFromUrl]) {
       setActiveFilter(filterFromUrl);
       const genreId = genreMapping[filterFromUrl];
-      setSelectedGenre(genreId);
-      searchGames("", genreId, sortBy);
+      if (setSelectedGenre && searchGames) {
+        setSelectedGenre(genreId);
+        searchGames("", genreId, sortBy);
+      }
     }
-  }, [searchGames, searchParams, setSelectedGenre, sortBy]);
+  }, [searchParams, sortBy]); // Removed dependencies that cause loops
 
-  // Filter games based on current selections
-  useEffect(() => {
-    let filtered = allGames;
+  // Memoized sort function
+  const sortGames = useCallback((games, sortBy) => {
+    if (!games || !Array.isArray(games)) return [];
 
-    // If we have search results from the hook, use those instead
-    if (showResults && searchResults.length >= 0) {
-      filtered = searchResults;
-    } else if (activeFilter !== "all" && genreMapping[activeFilter]) {
-      // Filter by genre using the activeFilter
-      const genreId = genreMapping[activeFilter];
-      filtered = allGames.filter(
-        (game) =>
-          game.genres && game.genres.some((g) => g.id.toString() === genreId)
-      );
-    }
-
-    // Apply search term filter if no search results from hook
-    if (searchTerm.trim() && (!showResults || searchResults.length === 0)) {
-      filtered = filtered.filter((game) =>
-        game.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Sort games
-    filtered = sortGames(filtered, sortBy);
-
-    setFilteredGames(filtered);
-    setCurrentPage(1);
-  }, [allGames, activeFilter, searchTerm, sortBy, searchResults, showResults]);
-
-  // Update displayed games for pagination
-  useEffect(() => {
-    const startIndex = (currentPage - 1) * GAMES_PER_PAGE;
-    const endIndex = startIndex + GAMES_PER_PAGE;
-    setDisplayedGames(filteredGames.slice(startIndex, endIndex));
-  }, [filteredGames, currentPage]);
-
-  const sortGames = (games, sortBy) => {
     const sortedGames = [...games];
     switch (sortBy) {
       case "name":
-        return sortedGames.sort((a, b) => a.name.localeCompare(b.name));
+        return sortedGames.sort((a, b) =>
+          (a.name || "").localeCompare(b.name || "")
+        );
       case "rating":
         return sortedGames.sort((a, b) => (b.rating || 0) - (a.rating || 0));
       case "released":
       case "release_date":
-        return sortedGames.sort(
-          (a, b) => new Date(b.released || 0) - new Date(a.released || 0)
-        );
+        return sortedGames.sort((a, b) => {
+          const dateA = new Date(a.released || 0);
+          const dateB = new Date(b.released || 0);
+          return dateB - dateA;
+        });
       case "metacritic":
         return sortedGames.sort(
           (a, b) => (b.metacritic || 0) - (a.metacritic || 0)
@@ -151,59 +124,193 @@ const Products = () => {
           (a, b) => (b.ratings_count || 0) - (a.ratings_count || 0)
         );
     }
-  };
-  const handleGameSelect = (game) => {
-    addToRecentViews(game);
-  };
+  }, []);
 
-  const openRatingModal = (game, e) => {
+  // Filter games based on current selections with error handling
+  useEffect(() => {
+    try {
+      let filtered = allGames || [];
+
+      // If we have search results from the hook, use those instead
+      if (showResults && Array.isArray(searchResults)) {
+        filtered = searchResults;
+      } else if (activeFilter !== "all" && genreMapping[activeFilter]) {
+        // Filter by genre using the activeFilter
+        const genreId = genreMapping[activeFilter];
+        filtered = (allGames || []).filter(
+          (game) =>
+            game.genres &&
+            Array.isArray(game.genres) &&
+            game.genres.some((g) => g.id && g.id.toString() === genreId)
+        );
+      }
+
+      // Apply search term filter if no search results from hook
+      if (
+        searchTerm &&
+        searchTerm.trim() &&
+        (!showResults || searchResults.length === 0)
+      ) {
+        filtered = filtered.filter(
+          (game) =>
+            game.name &&
+            game.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+
+      // Sort games
+      filtered = sortGames(filtered, sortBy);
+
+      setFilteredGames(filtered);
+      setCurrentPage(1);
+    } catch (error) {
+      console.error("Error filtering games:", error);
+      setFilteredGames([]);
+    }
+  }, [
+    allGames,
+    activeFilter,
+    searchTerm,
+    sortBy,
+    searchResults,
+    showResults,
+    sortGames,
+  ]);
+
+  // Update displayed games for pagination
+  useEffect(() => {
+    try {
+      const startIndex = (currentPage - 1) * GAMES_PER_PAGE;
+      const endIndex = startIndex + GAMES_PER_PAGE;
+      setDisplayedGames((filteredGames || []).slice(startIndex, endIndex));
+    } catch (error) {
+      console.error("Error paginating games:", error);
+      setDisplayedGames([]);
+    }
+  }, [filteredGames, currentPage]);
+
+  const handleGameSelect = useCallback(
+    (game) => {
+      if (addToRecentViews && game) {
+        addToRecentViews(game);
+      }
+    },
+    [addToRecentViews]
+  );
+
+  const openRatingModal = useCallback((game, e) => {
     e?.stopPropagation();
-    setSelectedGame(game);
-    setShowRatingModal(true);
-  };
-
-  const handleRatingSubmit = (rating) => {
-    if (selectedGame) {
-      submitRating(selectedGame.id, rating);
-      setShowRatingModal(false);
-      setSelectedGame(null);
+    if (game) {
+      setSelectedGame(game);
+      setShowRatingModal(true);
     }
-  };
+  }, []);
 
-  const handleSearch = (term) => {
-    setSearchTerm(term);
-    if (term.trim()) {
-      searchGames(term, selectedGenre, sortBy);
-    } else {
-      setShowResults(false);
+  const handleRatingSubmit = useCallback(
+    (rating) => {
+      if (selectedGame && submitRating) {
+        submitRating(selectedGame.id, rating);
+        setShowRatingModal(false);
+        setSelectedGame(null);
+      }
+    },
+    [selectedGame, submitRating]
+  );
+
+  const handleSearch = useCallback(
+    (term) => {
+      if (setSearchTerm) {
+        setSearchTerm(term);
+        if (term && term.trim() && searchGames) {
+          searchGames(term, selectedGenre, sortBy);
+        } else if (setShowResults) {
+          setShowResults(false);
+        }
+      }
+    },
+    [setSearchTerm, searchGames, selectedGenre, sortBy, setShowResults]
+  );
+
+  const handleGenreSelect = useCallback(
+    (genreId) => {
+      if (setSelectedGenre && searchGames) {
+        setSelectedGenre(genreId);
+        searchGames(searchTerm, genreId, sortBy);
+      }
+    },
+    [setSelectedGenre, searchGames, searchTerm, sortBy]
+  );
+
+  const handleSortChange = useCallback(
+    (newSortBy) => {
+      if (setSortBy && searchGames) {
+        setSortBy(newSortBy);
+        searchGames(searchTerm, selectedGenre, newSortBy);
+      }
+    },
+    [setSortBy, searchGames, searchTerm, selectedGenre]
+  );
+
+  const handleClearSearch = useCallback(() => {
+    if (clearSearch) {
+      clearSearch();
     }
-  };
-
-  const handleGenreSelect = (genreId) => {
-    setSelectedGenre(genreId);
-    searchGames(searchTerm, genreId, sortBy);
-  };
-
-  const handleSortChange = (newSortBy) => {
-    setSortBy(newSortBy);
-    searchGames(searchTerm, selectedGenre, newSortBy);
-  };
-
-  const handleClearSearch = () => {
-    clearSearch();
     setActiveFilter("all");
-    searchParams.delete("filter");
-    setSearchParams(searchParams);
-  };
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.delete("filter");
+    setSearchParams(newSearchParams);
+  }, [clearSearch, searchParams, setSearchParams]);
 
-  const totalPages = Math.ceil(filteredGames.length / GAMES_PER_PAGE);
+  const totalPages = useMemo(
+    () => Math.ceil((filteredGames || []).length / GAMES_PER_PAGE),
+    [filteredGames]
+  );
 
-  const GameCardWrapper = ({ game, index }) => {
+  // Safe render helper for platform icons
+  const renderPlatformIcon = useCallback((platform, index, gameId) => {
+    try {
+      if (!platform) return null;
+
+      const PlatformIcon = getPlatformIcon ? getPlatformIcon([platform]) : null;
+
+      if (PlatformIcon) {
+        return (
+          <PlatformIcon
+            key={`${gameId}-platform-${index}`}
+            className="w-5 h-5 text-gray-400"
+          />
+        );
+      }
+
+      return (
+        <div
+          key={`${gameId}-platform-${index}`}
+          className="w-5 h-5 bg-gray-600 rounded"
+        />
+      );
+    } catch (error) {
+      console.error("Error rendering platform icon:", error);
+      return (
+        <div
+          key={`${gameId}-platform-fallback-${index}`}
+          className="w-5 h-5 bg-gray-600 rounded"
+        />
+      );
+    }
+  }, []);
+
+  const GameCardWrapper = React.memo(({ game, index }) => {
+    if (!game) return null;
+
     const primaryGenre = game.genres?.[0]?.name || "Unknown";
-    const releaseDate =
-      formatReleaseDate(game.released) || formatDate(game.released);
-    const ratingScore =
-      formatRatingScore(game.rating) || Math.round((game.rating || 0) * 20);
+    const releaseDate = formatReleaseDate
+      ? formatReleaseDate(game.released)
+      : formatDate
+      ? formatDate(game.released)
+      : game.released || "TBA";
+    const ratingScore = formatRatingScore
+      ? formatRatingScore(game.rating)
+      : Math.round((game.rating || 0) * 20);
 
     if (viewMode === "list") {
       return (
@@ -216,7 +323,7 @@ const Products = () => {
             <div className="relative w-48 h-28 rounded-xl overflow-hidden flex-shrink-0">
               <img
                 src={game.background_image || "/placeholder-game.jpg"}
-                alt={game.name}
+                alt={game.name || "Game"}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 loading="lazy"
                 onError={(e) => {
@@ -239,7 +346,7 @@ const Products = () => {
                   </span>
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors line-clamp-1">
-                  {game.name}
+                  {game.name || "Unknown Game"}
                 </h3>
                 <div className="flex items-center gap-4 text-sm text-gray-400 mb-3">
                   <span className="flex items-center gap-1">
@@ -255,19 +362,9 @@ const Products = () => {
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  {game.platforms?.slice(0, 3).map((p, idx) => {
-                    const PlatformIcon = getPlatformIcon
-                      ? getPlatformIcon([p])
-                      : () => (
-                          <div className="w-5 h-5 bg-gray-600 rounded"></div>
-                        );
-                    return (
-                      <PlatformIcon
-                        key={`${game.id}-platform-${idx}`}
-                        className="w-5 h-5 text-gray-400"
-                      />
-                    );
-                  })}
+                  {(game.platforms || [])
+                    .slice(0, 3)
+                    .map((p, idx) => renderPlatformIcon(p, idx, game.id))}
                 </div>
                 <div className="flex items-center gap-2">
                   <Link to={`/products/${game.id}`}>
@@ -293,12 +390,34 @@ const Products = () => {
         onGameSelect={handleGameSelect}
         onRate={openRatingModal}
         onToggleFavorite={toggleFavorite}
-        isFavorited={isGameFavorited(game.id)}
+        isFavorited={isGameFavorited ? isGameFavorited(game.id) : false}
         className="animate-fade-in-up"
         style={{ animationDelay: `${index * 0.1}s` }}
       />
     );
-  };
+  });
+
+  // Error boundary render
+  if (error) {
+    return (
+      <>
+        <Navbar />
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/50 to-slate-900 flex items-center justify-center">
+          <div className="text-center text-white">
+            <h2 className="text-2xl font-bold mb-4">Something went wrong</h2>
+            <p className="text-gray-400 mb-6">Failed to load games data</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-semibold rounded-lg hover:from-cyan-600 hover:to-purple-600 transition-all duration-300"
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>
@@ -339,31 +458,33 @@ const Products = () => {
       <section className="container mx-auto max-w-7xl px-6 pb-20 -mt-10 relative z-20">
         {/* Enhanced Search Bar */}
         <div className="mb-8">
-          <SearchBar
-            searchTerm={searchTerm}
-            setSearchTerm={handleSearch}
-            showFilters={showFilters}
-            setShowFilters={setShowFilters}
-            selectedGenre={selectedGenre}
-            setSelectedGenre={handleGenreSelect}
-            sortBy={sortBy}
-            setSortBy={handleSortChange}
-            handleSearch={handleSearch}
-            clearSearch={handleClearSearch}
-            searchResults={searchResults}
-            showResults={showResults}
-            setShowResults={setShowResults}
-            handleGameSelect={handleGameSelect}
-            getRatingColor={getCustomRatingColor}
-            getUserRating={getUserRating}
-            openRatingModal={openRatingModal}
-            toggleFavorite={toggleFavorite}
-            isGameFavorited={isGameFavorited}
-            formatDate={formatDate}
-            popularGames={allGames.slice(0, 10)}
-            recentSearches={[]}
-            genres={genres}
-          />
+          {setSearchTerm && (
+            <SearchBar
+              searchTerm={searchTerm}
+              setSearchTerm={handleSearch}
+              showFilters={showFilters}
+              setShowFilters={setShowFilters}
+              selectedGenre={selectedGenre}
+              setSelectedGenre={handleGenreSelect}
+              sortBy={sortBy}
+              setSortBy={handleSortChange}
+              handleSearch={handleSearch}
+              clearSearch={handleClearSearch}
+              searchResults={searchResults}
+              showResults={showResults}
+              setShowResults={setShowResults}
+              handleGameSelect={handleGameSelect}
+              getRatingColor={getCustomRatingColor}
+              getUserRating={getUserRating}
+              openRatingModal={openRatingModal}
+              toggleFavorite={toggleFavorite}
+              isGameFavorited={isGameFavorited}
+              formatDate={formatDate}
+              popularGames={(allGames || []).slice(0, 10)}
+              recentSearches={[]}
+              genres={genres}
+            />
+          )}
         </div>
 
         {/* Controls */}
@@ -371,7 +492,7 @@ const Products = () => {
           <div className="flex justify-between items-center">
             <div className="relative">
               <select
-                value={sortBy}
+                value={sortBy || "relevance"}
                 onChange={(e) => handleSortChange(e.target.value)}
                 className="appearance-none bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-lg px-4 py-2 pr-10 text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-300 cursor-pointer"
               >
@@ -417,7 +538,7 @@ const Products = () => {
           <p className="text-gray-400">
             Showing{" "}
             <span className="text-cyan-400 font-semibold">
-              {filteredGames.length}
+              {(filteredGames || []).length}
             </span>{" "}
             games
             {activeFilter !== "all" && (
@@ -425,7 +546,9 @@ const Products = () => {
                 {" "}
                 in{" "}
                 <span className="text-purple-400 font-semibold">
-                  {capitalize(activeFilter.replace(/-/g, " "))}
+                  {capitalize
+                    ? capitalize(activeFilter.replace(/-/g, " "))
+                    : activeFilter}
                 </span>{" "}
                 category
               </span>
@@ -446,7 +569,7 @@ const Products = () => {
         {/* Games Grid/List */}
         {!loading && (
           <>
-            {displayedGames.length > 0 ? (
+            {displayedGames && displayedGames.length > 0 ? (
               <div
                 className={`${
                   viewMode === "grid"
@@ -482,7 +605,7 @@ const Products = () => {
             )}
 
             {/* Pagination */}
-            {totalPages > 1 && displayedGames.length > 0 && (
+            {totalPages > 1 && displayedGames && displayedGames.length > 0 && (
               <div className="mt-16 flex items-center justify-center gap-2">
                 <button
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
@@ -543,7 +666,7 @@ const Products = () => {
           }}
           game={selectedGame}
           onSubmitRating={handleRatingSubmit}
-          currentRating={getUserRating(selectedGame.id)}
+          currentRating={getUserRating ? getUserRating(selectedGame.id) : 0}
         />
       )}
 
