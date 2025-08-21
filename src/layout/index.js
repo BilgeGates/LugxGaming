@@ -1,0 +1,37 @@
+const PlayGuideLogo = ({ className = "" }) => (
+  <div className={`flex items-center space-x-3 ${className}`}>
+    <div className="relative">
+      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center relative overflow-hidden shadow-lg">
+        <div className="absolute inset-0 bg-white/10 rounded-xl "></div>
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          className="relative z-10 text-white"
+        >
+          <path
+            d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L8.91 8.26L12 2Z"
+            fill="currentColor"
+          />
+          <circle cx="12" cy="12" r="3" fill="white" opacity="0.8" />
+          <path
+            d="M9 12L11 14L15 10"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+            className="text-cyan-300"
+          />
+        </svg>
+      </div>
+      <div className="absolute inset-0 w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-cyan-500 blur-md opacity-30 "></div>
+    </div>
+    <div className="text-2xl font-bold bg-gradient-to-r from-white via-cyan-400 to-purple-400 bg-clip-text text-transparent">
+      Play Guide
+    </div>
+  </div>
+);
+
+export default PlayGuideLogo;
