@@ -452,10 +452,7 @@ const SearchBar = ({
   const hasPopularGames = popularGames.length > 0;
 
   return (
-    <div
-      className="relative w-full max-w-4xl mx-auto px-2 sm:px-4"
-      ref={searchRef}
-    >
+    <div className="relative w-full max-w-4xl mx-auto sm:px-4" ref={searchRef}>
       <div className="flex flex-col gap-3">
         {/* Search Input and Filter Button */}
         <div className="flex items-center gap-2">

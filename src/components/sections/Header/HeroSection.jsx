@@ -87,7 +87,7 @@ const HeroSection = ({
                   Welcome to Play Guide
                 </span>
               </div>
-              <h1 className="text-5xl lg:text-7xl font-bold text-white leading-tight">
+              <h1 className="text-5xl lg:text-7xl font-bold text-white leading-tight select-none">
                 Best{" "}
                 <span
                   style={{
