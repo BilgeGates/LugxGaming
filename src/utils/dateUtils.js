@@ -1,5 +1,5 @@
 /**
- * Date formatting utilities - Fixed version
+ * Date formatting utilities - Updated version
  */
 
 export const formatDate = (dateString) => {
@@ -13,17 +13,20 @@ export const formatDate = (dateString) => {
   }
 };
 
-export const formatTimeAgo = (dateString) => {
-  if (!dateString) return "N/A";
+export const formatTimeAgo = (dateValue) => {
+  if (!dateValue) return "N/A";
 
   try {
     let date;
 
-    // Unix timestamp check (10 digits)
-    if (String(dateString).length === 10) {
-      date = new Date(dateString * 1000);
+    if (typeof dateValue === "number") {
+      if (String(dateValue).length === 10) {
+        date = new Date(dateValue * 1000);
+      } else {
+        date = new Date(dateValue);
+      }
     } else {
-      date = new Date(dateString);
+      date = new Date(dateValue);
     }
 
     if (isNaN(date.getTime())) {
@@ -34,7 +37,7 @@ export const formatTimeAgo = (dateString) => {
     const diffInMs = now - date;
 
     if (diffInMs < 0) {
-      return "Future date";
+      return "Just now";
     }
 
     const diffInMinutes = Math.floor(diffInMs / (1000 * 60));

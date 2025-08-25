@@ -94,3 +94,51 @@ export const getPopularGames = (games, limit = 4) =>
 export const getTrendingGames = (games, limit = 10) => {
   return sortGames(games, "popularity").slice(0, limit);
 };
+
+// Genre definitions
+export const genres = [
+  { id: "action", name: "Action" },
+  { id: "adventure", name: "Adventure" },
+  { id: "role-playing-games-rpg", name: "RPG" },
+  { id: "shooter", name: "Shooter" },
+  { id: "strategy", name: "Strategy" },
+  { id: "sports", name: "Sports" },
+  { id: "racing", name: "Racing" },
+  { id: "puzzle", name: "Puzzle" },
+];
+
+// Safe utility functions for handling game data
+export const safeGetRatingColor = (getRatingColor, rating) => {
+  try {
+    return getRatingColor ? getRatingColor(rating) : "text-gray-500";
+  } catch {
+    return "text-gray-500";
+  }
+};
+
+export const safeGetUserRating = (getUserRating, gameId) => {
+  try {
+    return getUserRating ? getUserRating(gameId) : 0;
+  } catch {
+    return 0;
+  }
+};
+
+export const safeIsGameFavorited = (isGameFavorited, gameId) => {
+  try {
+    return isGameFavorited ? isGameFavorited(gameId) : false;
+  } catch {
+    return false;
+  }
+};
+
+// Date formatting utility
+export const formatGameDate = (formatDate, dateString) => {
+  try {
+    return formatDate
+      ? formatDate(dateString)
+      : new Date(dateString).getFullYear();
+  } catch {
+    return "Unknown";
+  }
+};
