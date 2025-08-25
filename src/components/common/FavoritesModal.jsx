@@ -75,14 +75,14 @@ const FavoritesModal = ({
                   key={game.id}
                   className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-200 ${
                     isGamePinned(game.id)
-                      ? "bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-400"
+                      ? "bg-gradient-to-r from-blue-50 to-purple-50 border-l-4 border-blue-400"
                       : "bg-gray-50 hover:bg-gray-100"
                   }`}
                 >
                   {isGamePinned(game.id) && (
                     <Pin
                       size={16}
-                      className="text-yellow-500"
+                      className="text-blue-500"
                       fill="currentColor"
                     />
                   )}
@@ -157,8 +157,8 @@ const FavoritesModal = ({
                       }}
                       className={`p-2 rounded-full transition-colors ${
                         isGamePinned(game.id)
-                          ? "text-yellow-500 bg-yellow-50 hover:bg-yellow-100"
-                          : "text-gray-400 hover:text-yellow-500 hover:bg-yellow-50"
+                          ? "text-blue-500 bg-blue-50 hover:bg-blue-100"
+                          : "text-gray-400 hover:text-blue-500 hover:bg-blue-50"
                       }`}
                       title={
                         isGamePinned(game.id) ? "Unpin from top" : "Pin to top"
