@@ -76,7 +76,7 @@ const Header = () => {
   ];
 
   return (
-    <div className="relative z-[99998]">
+    <div className="relative z-[99998] max-w-7xl mx-auto ">
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-10 left-10 w-20 h-20 bg-pink-500 rounded-full animate-pulse"></div>
         <div className="absolute top-32 right-20 w-16 h-16 bg-cyan-500 rounded-full animate-bounce"></div>

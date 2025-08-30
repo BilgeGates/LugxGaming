@@ -27,7 +27,7 @@ const Navbar = () => {
           : "bg-transparent py-6"
       }`}
     >
-      <div className="container mx-auto px-6 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <NavLink
           to="/"
           onClick={() => setMenuOpen(false)}
