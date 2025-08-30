@@ -34,7 +34,7 @@ const FavoritesModal = ({
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-md p-4">
+    <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-md p-4">
       <div
         ref={modalRef}
         className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden mx-4"

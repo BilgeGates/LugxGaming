@@ -81,7 +81,7 @@ const RatingModal = ({
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-[999999]"
+      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-[9999]"
       role="dialog"
       aria-modal="true"
       aria-labelledby="rating-modal-title"

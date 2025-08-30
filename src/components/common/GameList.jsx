@@ -1,17 +1,15 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { Calendar, Users, Eye } from "lucide-react";
+import GameCard from "./GameCard";
+import useGameData from "../../hooks/useGameData";
+import { formatReleaseDate, formatRatingScore } from "../../utils";
+import { CardOverlay } from "../ui";
 
-import { Calendar, Users, Eye } from "lucide-react"; // UI icons
-
-import GameCard from "./GameCard"; // Grid view card component
-import useGameData from "../../hooks/useGameData"; // Custom hook to fetch/filter/sort games
-
-import {
-  getPlatformIcon,
-  formatReleaseDate,
-  formatRatingScore,
-} from "../../utils";
-
+/**
+ * Fixed GamesList Component
+ * Resolved navigation conflicts and improved event handling
+ */
 const GamesList = ({
   viewMode = "grid",
   handleGameSelect,
@@ -19,12 +17,14 @@ const GamesList = ({
   openRatingModal,
   toggleFavorite,
   isGameFavorited,
+  getPlatformIcon,
   ...props
 }) => {
   const { allGames, loading, error, searchResults, showResults } =
     useGameData();
+  const navigate = useNavigate();
 
-  const renderPlatformIcon = React.useCallback((platform, index, gameId) => {
+  const renderPlatformIcon = useCallback((platform, index, gameId) => {
     if (!platform) return null;
     try {
       const PlatformIcon = getPlatformIcon([platform]);
@@ -47,6 +47,37 @@ const GamesList = ({
     );
   }, []);
 
+  const handleListItemClick = useCallback(
+    (game, event) => {
+      const target = event.target;
+      const isInteractiveElement =
+        target.closest("button") ||
+        target.closest("a") ||
+        target.closest('[role="button"]');
+
+      if (!isInteractiveElement) {
+        if (handleGameSelect && typeof handleGameSelect === "function") {
+          handleGameSelect(game);
+        }
+        navigate(`/products/${game.id}`);
+      }
+    },
+    [handleGameSelect, navigate]
+  );
+
+  const handleExploreClick = useCallback(
+    (game, event) => {
+      event.stopPropagation();
+      event.preventDefault();
+
+      if (handleGameSelect && typeof handleGameSelect === "function") {
+        handleGameSelect(game);
+      }
+      navigate(`/products/${game.id}`);
+    },
+    [handleGameSelect, navigate]
+  );
+
   const ListViewItem = ({ game }) => {
     const primaryGenre = game.genres?.[0]?.name || "Unknown";
     const releaseDate = formatReleaseDate(game.released);
@@ -54,8 +85,17 @@ const GamesList = ({
 
     return (
       <div
-        className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 cursor-pointer first-letter:max-w-7xl"
-        onClick={() => handleGameSelect(game)}
+        className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 cursor-pointer max-w-7xl"
+        onClick={(e) => handleListItemClick(game, e)}
+        role="button"
+        tabIndex={0}
+        aria-label={`View details for ${game.name}`}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleListItemClick(game, e);
+          }
+        }}
       >
         <div className="flex gap-6">
           <div className="relative w-48 h-28 rounded-xl overflow-hidden flex-shrink-0">
@@ -99,12 +139,14 @@ const GamesList = ({
                   .slice(0, 3)
                   .map((p, idx) => renderPlatformIcon(p, idx, game.id))}
               </div>
-              <Link to={`/products/${game.id}`}>
-                <button className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-semibold rounded-lg hover:from-cyan-600 hover:to-purple-600 transition-all duration-300 flex items-center gap-2">
-                  <Eye className="w-4 h-4" />
-                  Explore
-                </button>
-              </Link>
+              <button
+                onClick={(e) => handleExploreClick(game, e)}
+                className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-semibold rounded-lg hover:from-cyan-600 hover:to-purple-600 transition-all duration-300 flex items-center gap-2"
+                aria-label={`Explore ${game.name}`}
+              >
+                <Eye className="w-4 h-4" />
+                Explore
+              </button>
             </div>
           </div>
         </div>
@@ -144,6 +186,7 @@ const GamesList = ({
                   onToggleFavorite={toggleFavorite}
                   isFavorited={isGameFavorited(game.id)}
                   style={{ breakInside: "avoid", marginBottom: "1.5rem" }}
+                  CardOverlay={CardOverlay}
                   {...props}
                 />
               ))}

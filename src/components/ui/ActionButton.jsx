@@ -1,5 +1,9 @@
 import React from "react";
 
+/**
+ * Fixed ActionButton Component
+ * Simplified button component without navigation conflicts
+ */
 export const ActionButton = ({
   icon: Icon,
   onClick,
@@ -29,6 +33,7 @@ export const ActionButton = ({
       className={`${sizes[size]} rounded-full backdrop-blur-sm border transition-all duration-300 hover:scale-110 ${variants[variant]}`}
       title={title}
       aria-label={title}
+      type="button"
     >
       <Icon size={iconSizes[size]} fill={active ? "currentColor" : "none"} />
     </button>
