@@ -67,7 +67,7 @@ const About = () => {
   ];
 
   const stats = [
-    { number: "40", label: "Games in Database", icon: Gamepad2 },
+    { number: "800", label: "Games in Database", icon: Gamepad2 },
     { number: "0", label: "Active Users", icon: Users },
     { number: "0", label: "Reviews & Ratings", icon: Star },
     { number: "9 hours", label: "Uptime", icon: TrendingUp },
