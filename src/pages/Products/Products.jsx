@@ -125,7 +125,7 @@ const Products = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <div className="relative py-24 overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900/50 to-slate-900 text-white">
+      <div className="relative py-24 overflow-hidden 0 text-white">
         <div className="relative container mx-auto max-w-7xl px-6 text-white text-center z-10">
           <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-400 to-purple-400 bg-clip-text text-transparent">
             Game Products
