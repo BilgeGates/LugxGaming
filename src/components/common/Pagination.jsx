@@ -6,7 +6,7 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
   if (totalPages <= 1) return null;
 
   return (
-    <div className="mt-16 flex items-center justify-center gap-2">
+    <div className="absolute left-1/2 -translate-x-1/2 bottom-7 flex gap-2">
       {/* -------------------------
             Previous Page Button
         ------------------------- */}
