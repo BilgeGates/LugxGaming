@@ -1,5 +1,5 @@
-import React, { useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
   CardOverlay,

@@ -24,28 +24,31 @@ const GamesList = ({
     useGameData();
   const navigate = useNavigate();
 
-  const renderPlatformIcon = useCallback((platform, index, gameId) => {
-    if (!platform) return null;
-    try {
-      const PlatformIcon = getPlatformIcon([platform]);
-      if (PlatformIcon) {
-        return (
-          <PlatformIcon
-            key={`${gameId}-platform-${index}`}
-            className="w-5 h-5 text-gray-400"
-          />
-        );
+  const renderPlatformIcon = useCallback(
+    (platform, index, gameId) => {
+      if (!platform) return null;
+      try {
+        const PlatformIcon = getPlatformIcon([platform]);
+        if (PlatformIcon) {
+          return (
+            <PlatformIcon
+              key={`${gameId}-platform-${index}`}
+              className="w-5 h-5 text-gray-400"
+            />
+          );
+        }
+      } catch (error) {
+        console.error("Platform icon error:", error);
       }
-    } catch (error) {
-      console.error("Platform icon error:", error);
-    }
-    return (
-      <div
-        key={`${gameId}-platform-${index}`}
-        className="w-5 h-5 bg-gray-600 rounded"
-      />
-    );
-  }, []);
+      return (
+        <div
+          key={`${gameId}-platform-${index}`}
+          className="w-5 h-5 bg-gray-600 rounded"
+        />
+      );
+    },
+    [getPlatformIcon]
+  );
 
   const handleListItemClick = useCallback(
     (game, event) => {
@@ -164,7 +167,7 @@ const GamesList = ({
       )}
 
       {!loading && !error && (
-        <>
+        <div className="max-h-[600px] overflow-y-auto space-y-6">
           {gamesToDisplay.length === 0 ? (
             <p className="text-center text-gray-600">No results found</p>
           ) : viewMode === "list" ? (
@@ -192,7 +195,7 @@ const GamesList = ({
               ))}
             </div>
           )}
-        </>
+        </div>
       )}
 
       <style>{`
