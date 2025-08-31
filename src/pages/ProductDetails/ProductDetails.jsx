@@ -17,7 +17,6 @@ import {
   Gamepad2,
   ChevronRight,
   Award,
-  Users,
 } from "lucide-react";
 
 import Navbar from "../../layout/Navbar/Navbar";
@@ -26,7 +25,6 @@ import Footer from "../../layout/Footer/Footer";
 import useGameData from "../../hooks/useGameData";
 import {
   formatReleaseDate,
-  getRatingColor,
   formatRatingScore,
   formatReviewsCount,
   getMetacriticColor,
@@ -123,7 +121,6 @@ const ProductDetails = () => {
   const tags = game.tags?.slice(0, 12) || [];
 
   const ratingScore = formatRatingScore(game.rating);
-  const ratingColorClass = getRatingColor(game.rating);
   const ageRating = getAgeRating(game.esrb_rating);
   const formattedReviewsCount = formatReviewsCount(game.reviews_count);
   const ratingGradient = getRatingGradient(game.rating);
