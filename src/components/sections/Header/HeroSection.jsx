@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 import { getPopularGames } from "../../../utils";
 
@@ -124,7 +124,7 @@ const HeroSection = ({
                 setSelectedGenre={setSelectedGenre}
                 sortBy={sortBy}
                 setSortBy={setSortBy}
-                genres={genres}
+                genres={genres.slice(0, 5)}
                 handleSearch={handleSearch}
                 clearSearch={clearSearch}
                 searchResults={searchResults}
