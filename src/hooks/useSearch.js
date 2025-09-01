@@ -6,7 +6,6 @@ const useSearch = ({ handleSearch, onAddRecentSearch } = {}) => {
   const [sortBy, setSortBy] = useState("relevance");
   const [showFilters, setShowFilters] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedResultIndex, setSelectedResultIndex] = useState(-1);
   const [isSearching, setIsSearching] = useState(false);
   const [visibleCount, setVisibleCount] = useState(7);
@@ -26,7 +25,6 @@ const useSearch = ({ handleSearch, onAddRecentSearch } = {}) => {
 
       if (value.trim() || genre) {
         setIsSearching(true);
-        setShowSuggestions(false);
         setShowResults(true);
       }
 
@@ -46,11 +44,9 @@ const useSearch = ({ handleSearch, onAddRecentSearch } = {}) => {
 
       if (value.trim()) {
         setShowResults(true);
-        setShowSuggestions(false);
         debouncedSearch(value, selectedGenre, sortBy);
       } else {
         setShowResults(false);
-        setShowSuggestions(true);
         setIsSearching(false);
       }
     },
@@ -59,11 +55,9 @@ const useSearch = ({ handleSearch, onAddRecentSearch } = {}) => {
 
   const handleInputFocus = useCallback(() => {
     if (!searchTerm.trim()) {
-      setShowSuggestions(true);
       setShowResults(false);
     } else {
       setShowResults(true);
-      setShowSuggestions(false);
     }
   }, [searchTerm]);
 
@@ -71,7 +65,6 @@ const useSearch = ({ handleSearch, onAddRecentSearch } = {}) => {
     if (clearFn) clearFn();
     setSearchTerm("");
     setShowResults(false);
-    setShowSuggestions(true);
     setSelectedResultIndex(-1);
     setVisibleCount(7);
     setIsSearching(false);
@@ -86,7 +79,6 @@ const useSearch = ({ handleSearch, onAddRecentSearch } = {}) => {
       const newSort = filterType === "sort" ? value : sortBy;
 
       setShowResults(true);
-      setShowSuggestions(false);
       debouncedSearch(searchTerm, newGenre, newSort);
     },
     [selectedGenre, sortBy, searchTerm, debouncedSearch]
@@ -97,7 +89,6 @@ const useSearch = ({ handleSearch, onAddRecentSearch } = {}) => {
       handleGameSelect?.(game);
       onAddRecentSearch?.(game);
       setShowResults(false);
-      setShowSuggestions(false);
       setSelectedResultIndex(-1);
       setVisibleCount(7);
     },
@@ -109,7 +100,6 @@ const useSearch = ({ handleSearch, onAddRecentSearch } = {}) => {
       setSelectedGenre(genre.id);
       setSearchTerm("");
       setShowResults(true);
-      setShowSuggestions(false);
       handleSearch?.("", genre.id, sortBy);
       setVisibleCount(7);
     },
@@ -130,7 +120,6 @@ const useSearch = ({ handleSearch, onAddRecentSearch } = {}) => {
     setSortBy("relevance");
     setShowFilters(false);
     setShowResults(false);
-    setShowSuggestions(false);
     setSelectedResultIndex(-1);
     setIsSearching(false);
     setVisibleCount(7);
@@ -143,21 +132,17 @@ const useSearch = ({ handleSearch, onAddRecentSearch } = {}) => {
     sortBy,
     showFilters,
     showResults,
-    showSuggestions,
     selectedResultIndex,
     isSearching,
     visibleCount,
     loadingMore,
-
     setSearchTerm,
     setSelectedGenre,
     setSortBy,
     setShowFilters,
     setShowResults,
-    setShowSuggestions,
     setSelectedResultIndex,
     setVisibleCount,
-
     handleInputChange,
     handleInputFocus,
     handleClearSearch,

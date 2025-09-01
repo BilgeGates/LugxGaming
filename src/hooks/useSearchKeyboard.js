@@ -3,7 +3,6 @@ import { useEffect } from "react";
 const useSearchKeyboard = ({
   searchRef,
   showResults,
-  showSuggestions,
   searchResults = [],
   recentSearches = [],
   popularGames = [],
@@ -15,7 +14,6 @@ const useSearchKeyboard = ({
   handleGameSelect,
   onAddRecentSearch,
   setShowResults,
-  setShowSuggestions,
   setShowFilters,
 }) => {
   useEffect(() => {
@@ -23,7 +21,6 @@ const useSearchKeyboard = ({
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setShowResults(false);
         setShowFilters(false);
-        setShowSuggestions(false);
         setSelectedResultIndex(-1);
       }
     };
@@ -33,13 +30,11 @@ const useSearchKeyboard = ({
         ? searchResults
         : [...recentSearches, ...popularGames];
 
-      if ((!showResults && !showSuggestions) || currentResults.length === 0)
-        return;
+      if (!showResults || currentResults.length === 0) return;
 
       switch (event.key) {
         case "Escape":
           setShowResults(false);
-          setShowSuggestions(false);
           setSelectedResultIndex(-1);
           break;
         case "ArrowDown":
@@ -76,7 +71,6 @@ const useSearchKeyboard = ({
   }, [
     searchRef,
     showResults,
-    showSuggestions,
     searchResults,
     selectedResultIndex,
     handleResultClick,
@@ -88,7 +82,6 @@ const useSearchKeyboard = ({
     onAddRecentSearch,
     setShowResults,
     setShowFilters,
-    setShowSuggestions,
     setSelectedResultIndex,
   ]);
 

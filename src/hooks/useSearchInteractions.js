@@ -4,7 +4,6 @@ const useSearchInteractions = ({
   handleGameSelect,
   onAddRecentSearch,
   setShowResults,
-  setShowSuggestions,
   setSelectedResultIndex,
   resetVisibleCount,
   toggleFavorite,
@@ -17,7 +16,6 @@ const useSearchInteractions = ({
         onAddRecentSearch(game);
       }
       setShowResults(false);
-      setShowSuggestions(false);
       setSelectedResultIndex(-1);
       resetVisibleCount();
     },
@@ -25,7 +23,6 @@ const useSearchInteractions = ({
       handleGameSelect,
       onAddRecentSearch,
       setShowResults,
-      setShowSuggestions,
       setSelectedResultIndex,
       resetVisibleCount,
     ]
