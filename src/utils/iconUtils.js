@@ -1,33 +1,26 @@
 import {
-  Gamepad2,
-  Sword,
   Map,
   Castle,
   Brain,
-  Car,
-  Globe2,
-  Puzzle,
-  Ghost,
+  Trophy,
+  Target,
+  Shield,
   Users,
   Palette,
-  Trophy,
   Zap,
-  Shield,
-  Target,
+  Ghost,
+  Puzzle,
+  Sword,
 } from "lucide-react";
 
-import {
-  FaWindows,
-  FaPlaystation,
-  FaXbox,
-  FaInnosoft,
-  FaMobileAlt,
-} from "react-icons/fa";
+import { FaWindows, FaPlaystation, FaXbox, FaMobileAlt } from "react-icons/fa";
+
+import { SiNintendoswitch } from "react-icons/si";
 
 /**
- * Icon mapping utilities
+ * Genre icon mapping
+ * Return React component or null if not found
  */
-
 export const getGenreIcon = (genreName) => {
   const icons = {
     Action: Sword,
@@ -35,9 +28,9 @@ export const getGenreIcon = (genreName) => {
     RPG: Castle,
     Strategy: Brain,
     Sports: Trophy,
-    Racing: Car,
+    Racing: Target,
     Shooter: Target,
-    Simulation: Globe2,
+    Simulation: Brain,
     Puzzle: Puzzle,
     Fighting: Shield,
     Horror: Ghost,
@@ -47,16 +40,21 @@ export const getGenreIcon = (genreName) => {
     "Battle Royale": Zap,
   };
 
-  return icons[genreName] || Gamepad2;
+  return icons[genreName] || null;
 };
 
+/**
+ * Platform icon mapping
+ * Return React component or null if not found
+ */
 export const getPlatformIcon = (platformName) => {
   const icons = {
     PC: FaWindows,
     PlayStation: FaPlaystation,
     Xbox: FaXbox,
-    Nintendo: FaInnosoft,
+    Nintendo: SiNintendoswitch,
     Mobile: FaMobileAlt,
   };
-  return icons[platformName] || Gamepad2;
+
+  return icons[platformName] || null;
 };

@@ -99,13 +99,26 @@ export const getTrendingGames = (games, limit = 10) => {
 export const genres = [
   { id: "action", name: "Action" },
   { id: "adventure", name: "Adventure" },
-  { id: "role-playing-games-rpg", name: "RPG" },
+  { id: "indie", name: "Indie" },
+  { id: "rpg", name: "RPG" },
   { id: "shooter", name: "Shooter" },
-  { id: "strategy", name: "Strategy" },
+  { id: "casual", name: "Casual" },
+  { id: "simulation", name: "Simulation" },
+  { id: "puzzle", name: "Puzzle" },
+  { id: "arcade", name: "Arcade" },
+  { id: "platformer", name: "Platformer" },
+  { id: "racing", name: "Racing" },
+  { id: "massively-multiplayer", name: "Massively Multiplayer" },
   { id: "sports", name: "Sports" },
+  { id: "fighting", name: "Fighting" },
+  { id: "family", name: "Family" },
+  { id: "board-games", name: "Board Games" },
+  { id: "educational", name: "Educational" },
+  { id: "card", name: "Card" },
 ];
 
 export const sortOptions = [
+  { value: "popularity", label: "Popularity" },
   { value: "relevance", label: "Relevance" },
   { value: "rating", label: "Rating" },
   { value: "released", label: "Release Date" },
