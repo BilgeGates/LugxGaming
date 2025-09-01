@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowUp, Eye, Calendar, Users, Star, Heart } from "lucide-react";
 
 // Layout components
 import Navbar from "../../layout/Navbar/Navbar";
@@ -28,7 +27,10 @@ import {
 import { ErrorMessage, LoadingSpinner } from "../../components/ui";
 
 // Date utilities
-import { formatReleaseDate } from "../../utils/dateUtils";
+import { formatReleaseDate } from "../../utils";
+
+// Icons
+import { ArrowUp, Calendar, Users, Star, Heart } from "lucide-react";
 
 const Products = () => {
   useDocumentTitle("Products | PlayGuide");
@@ -41,7 +43,6 @@ const Products = () => {
   const recentViews = useRecentViews();
 
   const {
-    allGames = [],
     loading = false,
     error = null,
     searchTerm = "",
@@ -51,7 +52,6 @@ const Products = () => {
     sortBy = "popularity",
     searchResults = [],
     showResults = false,
-    setShowResults = () => {},
     genres = [],
   } = gameData || {};
 
@@ -125,7 +125,7 @@ const Products = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <div className="relative py-24 overflow-hidden 0 text-white">
+      <div className="relative pt-28 pb-24 overflow-hidden 0 text-white">
         <div className="relative container mx-auto max-w-7xl px-6 text-white text-center z-10">
           <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-white via-cyan-400 to-purple-400 bg-clip-text text-transparent">
             Game Products
@@ -161,9 +161,6 @@ const Products = () => {
             setSortBy={handleSortChange}
             handleSearch={handleSearch}
             clearSearch={combinedHandleClearSearch}
-            searchResults={searchResults}
-            showResults={showResults}
-            setShowResults={setShowResults}
             handleGameSelect={handleGameSelect}
             getRatingColor={getRatingColor}
             getUserRating={getUserRating}
@@ -171,7 +168,6 @@ const Products = () => {
             toggleFavorite={toggleFavorite}
             isGameFavorited={isGameFavorited}
             formatDate={formatReleaseDate}
-            popularGames={allGames.slice(0, 15)}
             recentSearches={[]}
             genres={genres}
           />

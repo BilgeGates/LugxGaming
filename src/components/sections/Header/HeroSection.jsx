@@ -149,7 +149,7 @@ const HeroSection = ({
                       key={index}
                       className={`flex items-center gap-2 ${
                         stat.clickable
-                          ? "cursor-pointer"
+                          ? "cursor-pointer text-white"
                           : "disabled:bg-gray-400 disabled:cursor-not-allowed select-none opacity-70"
                       }`}
                       onClick={stat.onClick}

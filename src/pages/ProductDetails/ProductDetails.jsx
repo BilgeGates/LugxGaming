@@ -309,7 +309,7 @@ const ProductDetails = () => {
                                   : "from-cyan-600 to-cyan-700"
                               } text-white text-sm rounded-full font-medium hover:scale-105 transform transition-all duration-300 cursor-default shadow-lg`}
                             >
-                              <GenreIcon className="w-4 h-4" />
+                              {GenreIcon && <GenreIcon className="w-4 h-4" />}
                               {genre.name}
                             </span>
                           );
@@ -335,7 +335,9 @@ const ProductDetails = () => {
                               key={platform.platform.id}
                               className="flex items-center gap-2 bg-gradient-to-r from-gray-700/50 to-gray-800/50 backdrop-blur-sm text-gray-300 text-sm rounded-lg px-3 py-2 border border-gray-600/30 hover:border-blue-500/50 transition-all duration-300"
                             >
-                              <PlatformIcon className="w-4 h-4" />
+                              {PlatformIcon && (
+                                <PlatformIcon className="w-4 h-4" />
+                              )}
                               {platform.platform.name}
                             </div>
                           );

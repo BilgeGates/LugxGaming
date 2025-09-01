@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import useGameData from "../../../hooks/useGameData";
-import useFavorites from "../../../hooks/useFavorites";
-import useRecentViews from "../../../hooks/useRecentViews";
-import useRating from "../../../hooks/useRating";
+import {
+  useGameData,
+  useFavorites,
+  useRecentViews,
+  useRating,
+} from "../../../hooks";
 
 import FavoritesModal from "../../../components/common/FavoritesModal";
 import RecentViewsModal from "../../../components/common/RecentViewsModal";

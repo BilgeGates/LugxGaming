@@ -1,11 +1,9 @@
-import React, { useRef, useCallback } from "react";
-
-import { Search, X, Filter, Clock, TrendingUp } from "lucide-react";
-
+import { useRef, useCallback } from "react";
 import SearchGameItem from "./SearchGameItem";
-
 import { useSearch, useSearchKeyboard } from "../../hooks";
 import { genres } from "../../utils";
+
+import { Search, X, Filter } from "lucide-react";
 
 const SearchBar = ({
   searchTerm: externalSearchTerm,
@@ -28,9 +26,6 @@ const SearchBar = ({
   toggleFavorite,
   isGameFavorited,
   formatDate,
-  popularGames = [],
-  recentSearches = [],
-  onAddRecentSearch,
 }) => {
   const searchRef = useRef(null);
 
@@ -40,15 +35,15 @@ const SearchBar = ({
     sortBy,
     showFilters,
     showResults,
-    showSuggestions,
     selectedResultIndex,
     isSearching,
     visibleCount,
     loadingMore,
     setSearchTerm,
+    setSelectedGenre: setInternalSelectedGenre,
+    setSortBy: setInternalSortBy,
     setShowFilters,
     setShowResults,
-    setShowSuggestions,
     setSelectedResultIndex,
     setVisibleCount,
     handleInputChange,
@@ -56,13 +51,9 @@ const SearchBar = ({
     handleClearSearch,
     handleFilterChange,
     handleResultClick,
-    handlePopularGenreClick,
-  } = useSearch({
-    handleSearch,
-    onAddRecentSearch,
-  });
+  } = useSearch({ handleSearch });
 
-  // Use external props if provided, otherwise use internal state
+  // External props override internal state if provided
   const currentSearchTerm = externalSearchTerm ?? searchTerm;
   const currentShowFilters = externalShowFilters ?? showFilters;
   const currentSelectedGenre = externalSelectedGenre ?? selectedGenre;
@@ -71,42 +62,26 @@ const SearchBar = ({
 
   const setCurrentSearchTerm = externalSetSearchTerm ?? setSearchTerm;
   const setCurrentShowFilters = externalSetShowFilters ?? setShowFilters;
+  const setCurrentSelectedGenre =
+    externalSetSelectedGenre ?? setInternalSelectedGenre;
+  const setCurrentSortBy = externalSetSortBy ?? setInternalSortBy;
 
-  console.log({
-    currentSearchTerm,
-    searchTerm,
-    externalSearchTerm,
-    searchResults,
-    recentSearches,
-    popularGames,
-    visibleCount,
-    loadingMore,
-    isSearching,
-    currentShowResults,
-    currentShowFilters,
-    currentSelectedGenre,
-    currentSortBy,
-  });
-
+  // Keyboard navigation
   useSearchKeyboard({
     searchRef,
     showResults: currentShowResults,
-    showSuggestions,
     searchResults,
-    recentSearches,
-    popularGames,
     selectedResultIndex,
     setSelectedResultIndex,
     visibleCount,
     searchTerm: currentSearchTerm,
     handleResultClick,
     handleGameSelect,
-    onAddRecentSearch,
     setShowResults: externalSetShowResults ?? setShowResults,
-    setShowSuggestions,
     setShowFilters: setCurrentShowFilters,
   });
 
+  // Input handler
   const onInputChange = useCallback(
     (e) => {
       const value = e.target.value;
@@ -123,31 +98,30 @@ const SearchBar = ({
 
   const onFilterChange = useCallback(
     (filterType, value) => {
-      // Update internal state through hook
+      // Update the appropriate state
+      if (filterType === "genre") {
+        setCurrentSelectedGenre(value);
+      }
+      if (filterType === "sort") {
+        setCurrentSortBy(value);
+      }
+
+      // Call the internal filter change handler
       handleFilterChange(filterType, value);
 
-      // Update external state if callbacks are provided
-      if (filterType === "genre" && externalSetSelectedGenre) {
-        externalSetSelectedGenre(value);
-      }
-      if (filterType === "sort" && externalSetSortBy) {
-        externalSetSortBy(value);
-      }
+      // Get current values for search
+      const genre = filterType === "genre" ? value : currentSelectedGenre;
+      const sort = filterType === "sort" ? value : currentSortBy;
 
-      // Trigger search with new filters
-      if (handleSearch && typeof handleSearch === "function") {
-        // Determine current values after update
-        const newGenre = filterType === "genre" ? value : currentSelectedGenre;
-        const newSort = filterType === "sort" ? value : currentSortBy;
-
-        // Call handleSearch with updated parameters
-        handleSearch(currentSearchTerm, newGenre, newSort);
+      // Trigger search with updated filters
+      if (handleSearch) {
+        handleSearch(currentSearchTerm, genre, sort);
       }
     },
     [
+      setCurrentSelectedGenre,
+      setCurrentSortBy,
       handleFilterChange,
-      externalSetSelectedGenre,
-      externalSetSortBy,
       handleSearch,
       currentSearchTerm,
       currentSelectedGenre,
@@ -155,85 +129,50 @@ const SearchBar = ({
     ]
   );
 
-  console.log({ onFilterChange });
-
   const onPopularGenreClick = useCallback(
     (genre) => {
-      handlePopularGenreClick(genre);
-      if (externalSetSelectedGenre) {
-        externalSetSelectedGenre(genre.id);
-      }
-      if (externalSetSearchTerm) {
-        externalSetSearchTerm("");
-      }
+      // Update genre state
+      setCurrentSelectedGenre(genre.id);
+      setCurrentSearchTerm("");
 
-      // Trigger search with selected genre
-      if (handleSearch && typeof handleSearch === "function") {
+      // Trigger search with new genre
+      if (handleSearch) {
         handleSearch("", genre.id, currentSortBy);
       }
     },
-    [
-      handlePopularGenreClick,
-      externalSetSelectedGenre,
-      externalSetSearchTerm,
-      handleSearch,
-      currentSortBy,
-    ]
+    [setCurrentSelectedGenre, setCurrentSearchTerm, handleSearch, currentSortBy]
   );
 
   const onResultsScroll = useCallback(
     (e) => {
       const target = e.target;
-      const currentResults = currentSearchTerm.trim()
-        ? searchResults
-        : [...recentSearches, ...popularGames];
 
       if (
         !loadingMore &&
         target.scrollTop + target.clientHeight >= target.scrollHeight - 20 &&
-        visibleCount < currentResults.length
+        visibleCount < searchResults.length
       ) {
-        setVisibleCount((v) => Math.min(v + 7, currentResults.length));
+        setVisibleCount((v) => Math.min(v + 7, searchResults.length));
       }
     },
-    [
-      loadingMore,
-      visibleCount,
-      currentSearchTerm,
-      searchResults,
-      recentSearches,
-      popularGames,
-      setVisibleCount,
-    ]
+    [loadingMore, visibleCount, searchResults.length, setVisibleCount]
   );
 
   const handleFavoriteToggle = useCallback(
     (game) => {
-      if (toggleFavorite && typeof toggleFavorite === "function") {
-        toggleFavorite(game);
-      }
+      if (toggleFavorite) toggleFavorite(game);
     },
     [toggleFavorite]
   );
 
-  const shouldShowSuggestions =
-    !isSearching && !currentSearchTerm.trim() && showSuggestions;
   const shouldShowSearchResults =
     !isSearching &&
     (currentSearchTerm.trim() || currentSelectedGenre) &&
     currentShowResults;
   const hasAnyResults = searchResults.length > 0;
-  const hasRecentSearches = recentSearches.length > 0;
-  const hasPopularGames = popularGames.length > 0;
-
-  const currentResults = currentSearchTerm.trim()
-    ? searchResults
-    : [...recentSearches, ...popularGames];
-
-  console.log({ currentResults, searchResults, recentSearches, popularGames });
 
   return (
-    <div className="relative w-full " ref={searchRef}>
+    <div className="relative w-full" ref={searchRef}>
       <div className="flex flex-col gap-3">
         {/* Search Input and Filter Button */}
         <div className="flex items-center gap-2">
@@ -335,7 +274,7 @@ const SearchBar = ({
                   id="genre-select"
                   value={currentSelectedGenre}
                   onChange={(e) => onFilterChange("genre", e.target.value)}
-                  className="w-full px-3 py-2.5 pr-8 rounded-lg bg-gray-900 bg-opacity-90 text-gray-200 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-0 appearance-none transition-all duration-200 ease-in-out hover:border-gray-600 focus:border-cyan-500 text-sm"
+                  className="w-full px-3 py-2.5 pr-8 rounded-lg bg-gray-900 bg-opacity-90 text-gray-200 border border-gray-700 focus:outline-none appearance-none transition-all duration-200 ease-in-out hover:border-gray-600 text-sm"
                 >
                   <option className="bg-gray-900 text-gray-200" value="">
                     All genres
@@ -362,8 +301,14 @@ const SearchBar = ({
                   id="sort-select"
                   value={currentSortBy}
                   onChange={(e) => onFilterChange("sort", e.target.value)}
-                  className="w-full px-3 py-2.5 pr-8 rounded-lg bg-gray-900 bg-opacity-90 text-gray-200 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-0 appearance-none transition-all duration-200 ease-in-out hover:border-gray-600 focus:border-cyan-500 text-sm"
+                  className="w-full px-3 py-2.5 pr-8 rounded-lg bg-gray-900 bg-opacity-90 text-gray-200 border border-gray-700 focus:outline-none appearance-none transition-all duration-200 ease-in-out hover:border-gray-600 text-sm"
                 >
+                  <option
+                    className="bg-gray-900 text-gray-200"
+                    valuse="popularity"
+                  >
+                    Popularity
+                  </option>
                   <option
                     className="bg-gray-900 text-gray-200"
                     value="relevance"
@@ -398,8 +343,7 @@ const SearchBar = ({
           bg-white bg-opacity-95 backdrop-blur-md
           transition-all duration-300 ease-in-out
           ${
-            (shouldShowSearchResults && hasAnyResults) ||
-            (shouldShowSuggestions && (hasRecentSearches || hasPopularGames))
+            shouldShowSearchResults && hasAnyResults
               ? "opacity-100 max-h-80 sm:max-h-96 pointer-events-auto"
               : "opacity-0 max-h-0 pointer-events-none"
           }`}
@@ -447,73 +391,6 @@ const SearchBar = ({
           </div>
         )}
 
-        {/* Suggestions */}
-        {shouldShowSuggestions && (hasRecentSearches || hasPopularGames) && (
-          <div className="p-3 sm:p-4">
-            {hasRecentSearches && (
-              <div className="mb-6">
-                <h3 className="text-gray-800 font-semibold mb-3 flex items-center gap-2 text-sm sm:text-base">
-                  <Clock size={14} className="text-blue-500" />
-                  Recent Searches
-                </h3>
-                <div className="space-y-1">
-                  {recentSearches
-                    .slice(0, Math.min(3, visibleCount))
-                    .map((game, index) => (
-                      <SearchGameItem
-                        key={`recent-${game.id}-${index}`}
-                        game={game}
-                        index={index}
-                        isRecent={true}
-                        selectedResultIndex={selectedResultIndex}
-                        onResultClick={(game) =>
-                          handleResultClick(game, handleGameSelect)
-                        }
-                        onFavoriteToggle={handleFavoriteToggle}
-                        onRatingClick={openRatingModal}
-                        getRatingColor={getRatingColor}
-                        getUserRating={getUserRating}
-                        isGameFavorited={isGameFavorited}
-                        formatDate={formatDate}
-                      />
-                    ))}
-                </div>
-              </div>
-            )}
-
-            {hasPopularGames && (
-              <div>
-                <h3 className="text-gray-800 font-semibold mb-3 flex items-center gap-2 text-sm sm:text-base">
-                  <TrendingUp size={14} className="text-orange-500" />
-                  Popular Games
-                </h3>
-                <div className="space-y-1">
-                  {popularGames
-                    .slice(0, visibleCount - Math.min(3, recentSearches.length))
-                    .map((game, index) => (
-                      <SearchGameItem
-                        key={`popular-${game.id}-${index}`}
-                        game={game}
-                        index={recentSearches.length + index}
-                        isPopular={true}
-                        selectedResultIndex={selectedResultIndex}
-                        onResultClick={(game) =>
-                          handleResultClick(game, handleGameSelect)
-                        }
-                        onFavoriteToggle={handleFavoriteToggle}
-                        onRatingClick={openRatingModal}
-                        getRatingColor={getRatingColor}
-                        getUserRating={getUserRating}
-                        isGameFavorited={isGameFavorited}
-                        formatDate={formatDate}
-                      />
-                    ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* No Results */}
         {shouldShowSearchResults && !hasAnyResults && (
           <div className="p-6 sm:p-8 text-center">
@@ -522,18 +399,6 @@ const SearchBar = ({
             </div>
             <div className="text-gray-400 text-sm mt-2">
               Try a different search term or genre
-            </div>
-          </div>
-        )}
-
-        {/* Empty State */}
-        {shouldShowSuggestions && !hasRecentSearches && !hasPopularGames && (
-          <div className="p-6 sm:p-8 text-center">
-            <div className="text-gray-500 italic text-base sm:text-lg">
-              No recent searches yet
-            </div>
-            <div className="text-gray-400 text-sm mt-2">
-              Start searching for games to see suggestions
             </div>
           </div>
         )}
@@ -550,28 +415,6 @@ const SearchBar = ({
           </div>
         )}
       </div>
-
-      <style>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out forwards;
-        }
-        
-        @media (max-width: 640px) {
-          .max-w-20 {
-            max-width: 4rem;
-          }
-        }
-      `}</style>
     </div>
   );
 };
