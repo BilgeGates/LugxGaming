@@ -6,6 +6,7 @@ import SearchBar from "../../../components/common/SearchBar";
 
 import { Gamepad2, Star, Users } from "lucide-react";
 
+// Hero section background images (auto-cycling slideshow)
 const heroImages = [
   "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&h=400&fit=crop&crop=center",
   "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&h=400&fit=crop&crop=center",
@@ -38,17 +39,26 @@ const HeroSection = ({
   isGameFavorited,
   formatDate,
 }) => {
+  // Tracks which hero image is currently shown
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [recentSearches, setRecentSearches] = useState([]);
-  const [popularGames, setPopularGames] = useState([]);
 
+  // Stores the last few recent searches
+  const [recentSearches, setRecentSearches] = useState([]);
+
+  /**
+   * Adds a game to the recent searches list.
+   * Ensures no duplicates and keeps only the latest 5.
+   */
   const handleAddRecentSearch = (game) => {
     setRecentSearches((prev) => {
       const filtered = prev.filter((g) => g.id !== game.id);
-      return [game, ...filtered].slice(0, 5);
+      return [game, ...filtered].slice(0, 1000);
     });
   };
 
+  /**
+   * Auto-rotate hero images every 5 seconds
+   */
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
@@ -57,21 +67,6 @@ const HeroSection = ({
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    if (allGames?.length > 0) {
-      try {
-        const popular = getPopularGames(allGames, 7);
-        setPopularGames(popular);
-      } catch (error) {
-        console.error("Popular games calculation error:", error);
-        const fallbackPopular = [...allGames]
-          .sort((a, b) => (b.rating || 0) - (a.rating || 0))
-          .slice(0, 7);
-        setPopularGames(fallbackPopular);
-      }
-    }
-  }, [allGames]);
-
   return (
     <header className="relative z-10 pt-20">
       <div className="container mx-auto px-6 py-8">
@@ -79,14 +74,18 @@ const HeroSection = ({
           className="flex flex-col lg:flex-row items-center justify-between min-h-screen lg:min-h-0"
           style={{ minHeight: "80vh" }}
         >
+          {/* Left side: heading, description, search bar, stats */}
           <div className="lg:w-1/2 space-y-8">
             <div className="space-y-4">
+              {/* Section label with small icon */}
               <div className="flex items-center gap-2 text-cyan-400">
                 <Gamepad2 size={24} />
                 <span className="text-sm font-semibold tracking-wider uppercase">
                   Welcome to Play Guide
                 </span>
               </div>
+
+              {/* Main headline */}
               <h1 className="text-5xl lg:text-7xl font-bold text-white leading-tight select-none">
                 Best{" "}
                 <span
@@ -102,12 +101,15 @@ const HeroSection = ({
                 </span>{" "}
                 Site Ever!
               </h1>
+
+              {/* Short description */}
               <p className="text-gray-300 text-lg leading-relaxed max-w-lg">
                 Discover amazing games from our curated collection. Search,
                 filter, and find your next favorite game with advanced search
                 capabilities.
               </p>
 
+              {/* Loading state */}
               {loading && (
                 <div className="flex items-center gap-2 text-cyan-400">
                   <div className="w-4 h-4 border-2 border-cyan-200 border-t-cyan-400 rounded-full animate-spin"></div>
@@ -115,6 +117,7 @@ const HeroSection = ({
                 </div>
               )}
 
+              {/* Search bar with filters, favorites, rating modal, etc. */}
               <SearchBar
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
@@ -137,11 +140,11 @@ const HeroSection = ({
                 isGameFavorited={isGameFavorited}
                 formatDate={formatDate}
                 openRatingModal={openRatingModal}
-                popularGames={popularGames}
                 recentSearches={recentSearches}
                 onAddRecentSearch={handleAddRecentSearch}
               />
 
+              {/* Game statistics (clickable shortcuts) */}
               {!loading && (
                 <div className="flex items-center gap-6 text-sm text-gray-300 flex-wrap">
                   {stats.map((stat, index) => (
@@ -163,14 +166,17 @@ const HeroSection = ({
             </div>
           </div>
 
+          {/* Right side: hero image with overlay badges and effects */}
           <div className="lg:w-1/2 flex justify-center lg:justify-end w-full mt-12 lg:mt-0">
             <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-lg">
+              {/* Hero image (auto-rotating) */}
               <img
                 src={heroImages[currentImageIndex]}
                 alt="Gaming Hero"
                 className="relative w-full h-auto rounded-xl sm:rounded-2xl shadow-2xl transform hover:scale-105 transition-all duration-500"
               />
 
+              {/* Hero image navigation dots */}
               <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
                 {heroImages.map((_, index) => (
                   <button
@@ -186,7 +192,7 @@ const HeroSection = ({
                 ))}
               </div>
 
-              {/* Animated Game Icon */}
+              {/* Floating animated gamepad icon */}
               <div
                 className="absolute -bottom-4 -right-4 p-4 rounded-xl shadow-lg animate-bounce"
                 style={{
@@ -197,7 +203,7 @@ const HeroSection = ({
                 <Gamepad2 size={30} className="text-white" />
               </div>
 
-              {/* Rating Badge - Positioned properly for all screen sizes */}
+              {/* Rating badge */}
               <div
                 className="absolute p-3 rounded-lg shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300"
                 style={{
@@ -213,7 +219,7 @@ const HeroSection = ({
                 </div>
               </div>
 
-              {/* Players Badge - Positioned properly for all screen sizes */}
+              {/* Players badge */}
               <div
                 className="absolute p-3 rounded-lg shadow-lg transform -rotate-3 hover:rotate-0 transition-transform duration-300"
                 style={{
