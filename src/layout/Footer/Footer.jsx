@@ -13,8 +13,6 @@ import {
   Brain,
   Car,
   Puzzle,
-  Facebook,
-  Twitter,
   Linkedin,
   Github,
 } from "lucide-react";
@@ -121,24 +119,14 @@ const Footer = () => {
               <div className="flex space-x-4">
                 {[
                   {
-                    icon: Facebook,
-                    href: "https://www.facebook.com/profile.php?id=100091496015332",
-                    color: "hover:text-blue-400 hover:shadow-blue-400/25",
-                  },
-                  {
-                    icon: Twitter,
-                    href: "https://x.com/DeveloperKhatai",
-                    color: "hover:text-cyan-400 hover:shadow-cyan-400/25",
-                  },
-                  {
                     icon: Linkedin,
                     href: "https://www.linkedin.com/in/khatai-huseynzade-464730289/",
-                    color: "hover:text-blue-500 hover:shadow-blue-500/25",
+                    color: "hover:text-blue-500 hover:shadow-cyan-400/25",
                   },
                   {
                     icon: Github,
                     href: "https://github.com/bilgegates",
-                    color: "hover:text-gray-300 hover:shadow-gray-300/25",
+                    color: "hover:text-blue-500 hover:shadow-cyan-400/25",
                   },
                 ].map((social, index) => (
                   <a
@@ -146,7 +134,7 @@ const Footer = () => {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`w-12 h-12 rounded-xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20 flex items-center justify-center ${social.color} transition-all duration-300 hover:scale-110 hover:bg-white/20 hover:border-white/40 hover:shadow-lg`}
+                    className={`w-12 h-12 rounded-xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20 flex items-center justify-center ${social.color} transition-all duration-300 hover:bg-white/20 hover:border-white/40 hover:shadow-lg`}
                   >
                     <social.icon size={20} />
                   </a>
