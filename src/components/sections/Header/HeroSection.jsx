@@ -127,7 +127,7 @@ const HeroSection = ({
                 setSelectedGenre={setSelectedGenre}
                 sortBy={sortBy}
                 setSortBy={setSortBy}
-                genres={genres.slice(0, 5)}
+                genres={genres}
                 handleSearch={handleSearch}
                 clearSearch={clearSearch}
                 searchResults={searchResults}
@@ -153,7 +153,7 @@ const HeroSection = ({
                       className={`flex items-center gap-2 ${
                         stat.clickable
                           ? "cursor-pointer text-white"
-                          : "disabled:bg-gray-400 disabled:cursor-not-allowed select-none opacity-70"
+                          : "disabled:bg-gray-400 disabled:cursor-not-allowed select-none opacity-65"
                       }`}
                       onClick={stat.onClick}
                     >

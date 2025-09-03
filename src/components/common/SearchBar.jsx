@@ -1,7 +1,8 @@
 import { useRef, useCallback } from "react";
+
 import SearchGameItem from "./SearchGameItem";
+
 import { useSearch, useSearchKeyboard } from "../../hooks";
-import { genres } from "../../utils";
 
 import { Search, X, Filter } from "lucide-react";
 
@@ -26,6 +27,7 @@ const SearchBar = ({
   toggleFavorite,
   isGameFavorited,
   formatDate,
+  genres,
 }) => {
   const searchRef = useRef(null);
 
@@ -56,6 +58,10 @@ const SearchBar = ({
   // External props override internal state if provided
   const currentSearchTerm = externalSearchTerm ?? searchTerm;
   const currentShowFilters = externalShowFilters ?? showFilters;
+
+  const safeGenres = genres || [];
+  const displayGenres = safeGenres.slice(0, 5);
+
   const currentSelectedGenre = externalSelectedGenre ?? selectedGenre;
   const currentSortBy = externalSortBy ?? sortBy;
   const currentShowResults = externalShowResults ?? showResults;
@@ -187,7 +193,7 @@ const SearchBar = ({
               onChange={onInputChange}
               onFocus={handleInputFocus}
               placeholder="Search by game name, genre or keyword..."
-              className="w-full pl-5 sm:pl-6 pr-10 sm:pr-12 py-3 sm:py-4 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-cyan-500 transition-all duration-300 border text-sm sm:text-base"
+              className="w-full pl-5 sm:pl-6 pr-10 sm:pr-12 h-auto py-2 sm:py-4 rounded-xl text-white placeholder-gray-400 focus:outline-none transition-all duration-300 border text-sm sm:text-base"
               style={{
                 backgroundColor: "rgba(255, 255, 255, 0.1)",
                 backdropFilter: "blur(10px)",
@@ -209,7 +215,7 @@ const SearchBar = ({
 
           <button
             onClick={() => setCurrentShowFilters(!currentShowFilters)}
-            className={`px-3 py-3 sm:px-4 sm:py-4 rounded-xl transition-all duration-300 ease-in-out transform hover:scale-105 ${
+            className={`h-13 px-3 py-3 sm:px-4 sm:py-4 rounded-xl transition-all duration-300 ease-in-out transform hover:scale-105 ${
               currentShowFilters
                 ? "bg-purple-700 text-white shadow-lg"
                 : "bg-purple-600 hover:bg-purple-700 text-white shadow-md hover:shadow-lg"
@@ -223,7 +229,7 @@ const SearchBar = ({
 
         {/* Genre Tags */}
         <div className="flex flex-wrap gap-1.5 sm:gap-2">
-          {genres.map((genre) => (
+          {displayGenres.map((genre) => (
             <button
               key={genre.id}
               onClick={() => onPopularGenreClick(genre)}
@@ -279,7 +285,7 @@ const SearchBar = ({
                   <option className="bg-gray-900 text-gray-200" value="">
                     All genres
                   </option>
-                  {genres.map((genre) => (
+                  {safeGenres.map((genre) => (
                     <option
                       key={genre.id}
                       value={genre.id}
