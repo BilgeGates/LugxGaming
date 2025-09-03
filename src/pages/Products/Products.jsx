@@ -52,7 +52,6 @@ const Products = () => {
     sortBy = "popularity",
     searchResults = [],
     showResults = false,
-    genres = [],
   } = gameData || {};
 
   const { toggleFavorite = () => {}, isGameFavorited = () => false } =
@@ -149,7 +148,7 @@ const Products = () => {
 
       {/* Main Section */}
       <section className="container mx-auto max-w-7xl px-6 pb-32 -mt-10 relative z-20">
-        <div className="mb-8">
+        <div className="flex gap-2 items-center mb-8">
           <SearchBar
             searchTerm={searchTerm}
             setSearchTerm={handleSearch}
@@ -169,16 +168,14 @@ const Products = () => {
             isGameFavorited={isGameFavorited}
             formatDate={formatReleaseDate}
             recentSearches={[]}
-            genres={genres}
+          />
+          <Controls
+            sortBy={sortBy}
+            handleSortChange={handleSortChange}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
           />
         </div>
-
-        <Controls
-          sortBy={sortBy}
-          handleSortChange={handleSortChange}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-        />
 
         {loading && <LoadingSpinner />}
 
