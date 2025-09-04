@@ -148,7 +148,7 @@ const Products = () => {
 
       {/* Main Section */}
       <section className="container mx-auto max-w-7xl px-6 pb-32 -mt-10 relative z-20">
-        <div className="flex gap-2 items-center mb-8">
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-8">
           <SearchBar
             searchTerm={searchTerm}
             setSearchTerm={handleSearch}
@@ -178,11 +178,10 @@ const Products = () => {
         </div>
 
         {loading && <LoadingSpinner />}
-
         {!loading && displayedGames.length > 0 && (
           <>
             {viewMode === "grid" ? (
-              <div className="colums-1 sm:columns-2 lg:columns-4 gap-6">
+              <div className="columns-1 sm:columns-2 lg:columns-4 gap-6">
                 {displayedGames.map((game) => (
                   <GameCard
                     key={game.id}
